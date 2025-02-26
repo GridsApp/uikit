@@ -1,0 +1,13 @@
+{
+  "src/Resources/js/app.js": {
+    "file": "app-BNmayBpR.js",
+    "name": "app",
+    "src": "src/Resources/js/app.js",
+    "isEntry": true
+  },
+  "src/Resources/scss/app.scss": {
+    "file": "app-DX-eGer7.css",
+    "src": "src/Resources/scss/app.scss",
+    "isEntry": true
+  }
+}
