@@ -25,6 +25,13 @@ class DefaultServiceProvider extends ServiceProvider{
         Livewire::component('elements.toggle',\twa\uikit\Elements\Toggle::class);
 
 
+        Livewire::component('components.table',\twa\uikit\Components\Table::class);
+
+
+
+
+
+
         
         // $this->loadScriptAndStyles();
 

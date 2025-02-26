@@ -695,4 +695,217 @@ export default class Functions {
       },
     };
   }
+
+  initTable() {
+    return {
+        selected: [],
+        selectable: [],
+        values: [],
+        coordinates: {},
+        selectedAll: false,
+        actionsActive: null,
+        allActions: [],
+        actions: {
+            allowEdit: true,
+            allowDelete: true,
+        },
+
+        init() {
+            let selectable = [];
+            document
+                .querySelectorAll(".checkbox-row:not(:disabled)")
+                .forEach((checkbox) => {
+                    selectable.push(String(checkbox.value));
+                });
+
+            this.selectable = selectable;
+
+            let actions = [];
+
+            let defaultActions = {
+                allowEdit: true,
+                allowDelete: true,
+            };
+
+            document.querySelectorAll(".td-actions").forEach((tdAction) => {
+                if (tdAction.getAttribute("data-target")) {
+                    actions.push({
+                        row: tdAction.getAttribute("data-target"),
+                        actions: {
+                            ...defaultActions,
+                            allowEdit:
+                                tdAction.getAttribute(
+                                    "data-operation-disable-edit"
+                                ) != "true",
+                            allowDelete:
+                                tdAction.getAttribute(
+                                    "data-operation-disable-delete"
+                                ) != "true",
+                        },
+                    });
+                }
+            });
+
+            this.allActions = actions;
+        },
+
+        async handleDelete() {
+            var response = await this.$wire.handleDelete([
+                this.actionsActive,
+            ]);
+            this.refresh();
+            this.fillValues();
+        },
+
+        async handleDeleteAll() {
+            var response = await this.$wire.handleDelete(this.selected);
+
+            this.refresh();
+            this.fillValues();
+        },
+
+        fillValues() {
+            if (this.values.length > 0) {
+                return;
+            }
+
+            this.values = [];
+
+            let checkboxes = document.querySelectorAll(
+                "input[type=checkbox].checkbox-row"
+            );
+
+            var values = [];
+            checkboxes.forEach(function (checkbox) {
+                values.push(checkbox.value);
+            });
+            this.values = values;
+        },
+
+        refresh() {
+            this.selectedAll = false;
+            this.selected = [];
+            this.values = [];
+            this.actionsActive = null;
+        },
+
+        handleSelect() {
+            this.fillValues();
+
+            this.selectedAll = window.Functions.arraysEqualUnordered(
+                this.selected,
+                this.selectable
+            );
+        },
+
+        handleSelectAll(event) {
+            this.fillValues();
+
+            if (
+                window.Functions.arraysEqualUnordered(
+                    this.selected,
+                    this.selectable
+                )
+            ) {
+                this.selected = [];
+                return;
+            }
+
+            this.selected = collect([
+                ...this.selected,
+                ...this.selectable,
+            ]).toArray();
+        },
+
+        handleClickAway() {
+            this.actionsActive = null;
+
+            this.$event.stopPropagation();
+        },
+
+        checkTDActionsDisabled(id) {
+            let obj = collect(this.allActions).where("row", id).first();
+
+            if (obj == null) {
+                return true;
+            }
+
+            let actions = obj["actions"];
+
+            return Object.values(actions).every((value) => value == false);
+        },
+
+        handleBox(event, id) {
+            var tdAction = document.getElementById("td-actions-" + id);
+
+            if (this.checkTDActionsDisabled(id)) {
+                return false;
+            }
+
+            this.actions = collect(this.allActions)
+                .where("row", id)
+                .first()["actions"];
+
+            // if(tdAction.getAttribute('data-operation-disable-edit') == "true"){
+            //     this.actions = { ...this.actions , allowEdit : false};
+            // }else{
+            //     this.actions = { ...this.actions , allowEdit : true};
+            // }
+
+            // if(tdAction.getAttribute('data-operation-disable-delete') == "true"){
+            //     this.actions = { ...this.actions , allowDelete : false};
+            // }else{
+            //     this.actions = { ...this.actions , allowDelete : true};
+            // }
+
+            const rect = tdAction.getBoundingClientRect();
+
+            const pageX =
+                window.innerWidth - rect.right + 0.75 * rect.width;
+            const pageY = rect.top + window.pageYOffset + 0.5 * rect.height;
+
+            let dataId = tdAction.parentElement.getAttribute("data-id");
+
+            this.coordinates[dataId] = { x: pageX, y: pageY };
+
+            if (this.actionsActive == id) {
+                this.actionsActive = null;
+            } else {
+                setTimeout(() => {
+                    var old = 0;
+                    if (this.actionsActive != null) {
+                        old = this.coordinates[this.actionsActive].y;
+                    }
+
+                    this.actionsActive = parseInt(id);
+                }, 0);
+            }
+        },
+    };
+}
+
+initFilter() {
+  return {
+      open: false,
+      hideField2: false,
+    
+
+      openDropdown() {
+          this.open = true;
+      },
+
+      initFilterItem(initSelected) {
+
+          return {
+              openDropdown: initSelected == 'true' || initSelected == 1,
+              hideField2: false,
+
+              optionChanged(event) {
+                  this.hideField2 = event.target.value === 'between';
+              }
+          };
+      }
+  };
+}
+
 }
