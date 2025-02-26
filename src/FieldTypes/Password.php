@@ -2,6 +2,7 @@
 
 namespace twa\uikit\FieldTypes;
 
+use Illuminate\Support\Facades\Hash;
 
 class Password extends FieldType
 {
@@ -18,7 +19,7 @@ class Password extends FieldType
 
     public function value($form)
     {
-        return ($form[$this->field['name']] ?? null) ? md5($form[$this->field['name']]) : null;
+        return ($form[$this->field['name']] ?? null) ? Hash::make($form[$this->field['name']]) : null;
     }
 
     public function display($data)
