@@ -5,7 +5,7 @@
 
 {{-- @dd($filters); --}}
 <div x-data="window.Functions.initFilter()" class="filter-dropdown-container" x-on:clear-filters.window="open = false"
-    x-on:apply-filter.window="open = false">
+    x-on:apply-filters.window="open = false">
     @if ($filters->count() > 0)
         <div class="filter-dropdown-container-header">
             <button class="filter-dropdown-button " @click="openDropdown">
@@ -36,7 +36,7 @@
                 </div>
             </div>
         </div>
-        <div class="box">
+        <div class="filter-box">
             @foreach ($filters as $filter)
                 @php
                     $initSelected = $this->filter[$filter['name']]['enabled'] ?? false ? true : false;
@@ -45,8 +45,10 @@
                     <div class="filter-dropdown-menu-item" x-data="initFilterItem({{ $initSelected }})"
                         x-on:clear-filters.window="openDropdown = false">
                         <label class="filter-dropdown-menu-link gap-3">
-                            <input class="filter-checkboxes" type="checkbox"
-                                {{-- x-model="filter.{{ $filter['name'] }}.enabled" --}}
+                            <input  type="checkbox"
+                            class="checkbox checkbox-sm"
+                            {{-- class="w-4 h-4 text-blue-600  border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" type="checkbox" --}}
+                               
                                 wire:model="filter.{{ $filter['name'] }}.enabled"  
                                 x-on:change="openDropdown = !openDropdown">
                             <div class="filter-dropdown-menu-title cursor-pointer">

@@ -5,7 +5,7 @@ namespace twa\uikit\Components;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
-
+use Livewire\Attributes\On;
 
 class Table extends Component
 {
@@ -14,10 +14,13 @@ class Table extends Component
     public $columns = null;
     public $table = null;
     public $slug = null;
+    public $title = "";
     public $filters = [];
 
+    public $conditions = [];
+    public $emptyFilter = [];
     public $filter = [];
-
+    public $enabledFilterCount = 0;
 
     protected $queryString = [
         'filter' => ['except' => ''],
@@ -25,20 +28,15 @@ class Table extends Component
 
     public function mount()
     {
-
-        // dd($this->filter); 
-
-
         $updated_filters = [];
 
         foreach ($this->filters as $filter) {
 
-            // dd()
             $class = new ($filter['type'])($filter);
             $options = $class->options();
 
             $default_option = collect($options)->where('active', true)->first()['value'] ?? null;
-
+      
             $operand_options_field = count($options) > 0 ? [
                 'id' => uniqid(),
                 'livewire' => [
@@ -60,7 +58,6 @@ class Table extends Component
                     '@change' => 'optionChanged',
                 ]
             ] : null;
-
 
             $field1 = [
                 'id' => uniqid(),
@@ -92,7 +89,6 @@ class Table extends Component
                 'container' => 'col-span-12'
             ];
 
-
             if (is_a($class->field_type, \twa\uikit\FieldTypes\Select::class, true)) {
                 $field1['options'] = [
                     'type' => 'query',
@@ -101,36 +97,36 @@ class Table extends Component
                 ];
             }
 
-            // if((new $class->field_type(null)) instanceof \twa\cmsv2\Entities\FieldTypes\Select){
-            //     $field1['options'] = [
-            //         'type' => 'query',
-            //         'table' => 'movie_directors',
-            //         'field' => $filter['column']
-            //     ];
-            // }
-
-            
-
-           
-            if(($filter['db_type'] ?? "") == "BOOLEAN"){
+            if (($filter['db_type'] ?? "") == "BOOLEAN") {
                 $this->filter[$filter['name']]['value1'] = (string) $this->filter[$filter['name']]['value1'];
-                $this->filter[$filter['name']]['value1'] = $this->filter[$filter['name']]['value1'] == "true" || $this->filter[$filter['name']]['value1'] == "1" ? true : false; 
+                $this->filter[$filter['name']]['value1'] = $this->filter[$filter['name']]['value1'] == "true" || $this->filter[$filter['name']]['value1'] == "1" ? true : false;
             }
 
 
-            if(($filter['relationship'] ?? '' == 'hasMany') && !collect($this->columns)->where('alias' ,$filter['column'])->first()){
+      
+                $enabled = (string) ($this->filter[$filter['name']]['enabled'] ?? false);
+                $enabled = $enabled == "true" || $enabled == "1" ? true : false;
+        
+
+            if (($filter['relationship'] ?? '' == 'hasMany') && !collect($this->columns)->where('alias', $filter['column'])->first()) {
                 continue;
             }
 
-
             $this->filter[$filter['name']] = [
-                'enabled' => (bool) ($this->filter[$filter['name']]['enabled'] ?? false),
+                'enabled' => $enabled,
                 'option' => $this->filter[$filter['name']]['option'] ?? $default_option,
                 'value1' => $this->filter[$filter['name']]['value1'] ?? null,
                 'value2' => $this->filter[$filter['name']]['value2'] ?? null
             ];
 
-           
+            $this->emptyFilter[$filter['name']] = [
+                'enabled' => false,
+                'option' => $default_option,
+                'value1' =>  null,
+                'value2' =>  null
+            ];
+
+
             $updated_filters[] = [
                 'name' => $filter['name'],
                 'column' =>  $filter['column'],
@@ -143,66 +139,75 @@ class Table extends Component
                 'operand' => $operand_options_field,
                 'field1' => $field1,
                 'field2' => $field2,
-                
-
             ];
         }
-        // dd($this->filter);
 
         $this->filters = $updated_filters;
-
-        
-        // dd($updated_filters);
-
-
+        $this->enabledFilterCount = collect($this->filter)
+        ->filter(fn($filter) => $filter['enabled'])
+        ->count();
     }
 
 
-    public function setFilters($rows, &$joins , $selects)
+    public function setFilters($rows, &$joins, $selects)
     {
 
 
-       
-
         foreach ($this->filter as $column => $filter) {
-            
-  
-            if (!$filter['enabled']) { continue; }
-        
-            $current_filter = collect($this->filters)->where('name' , $column)->first();
 
-            if (!$current_filter) { continue; }
 
-           
+            if (!$filter['enabled']) {
+                continue;
+            }
 
-            $current_filter['relationship'] = $current_filter['relationship'] ?? null;  
-            
-            
-            if(!isset($filter['value1'])){
+            $current_filter = collect($this->filters)->where('name', $column)->first();
+
+            if (!$current_filter) {
+                continue;
+            }
+
+
+
+            $current_filter['relationship'] = $current_filter['relationship'] ?? null;
+
+
+            if (!isset($filter['value1'])) {
                 $filter['value1'] = null;
             }
 
             $filter['value1'] = (string) $filter['value1'];
 
-           
+
             // dd($filter['value1']);
             // if($filter['value1'] == "null" || $filter['value1'] == ""){ continue; }
-        
-           
-            (new ($current_filter['type']))->handle($rows , $joins , $this->columns , $this->table, $current_filter ,$filter);
 
+
+            (new ($current_filter['type']))->handle($rows, $joins, $this->columns, $this->table, $current_filter, $filter);
         }
 
         return $rows;
     }
 
+    
+  
+    public function clearFilters()
+    {
+        $this->reset(['filter']);
+        $this->filter = [...$this->emptyFilter];
+
+        $this->dispatch('clear-filters');
+        $this->enabledFilterCount = 0;
+        // $this->resetPage();
+    }
+
 
     public function applyFilters()
     {
-
-
-
+        $this->enabledFilterCount = collect($this->filter)
+            ->filter(fn($filter) => $filter['enabled'])
+            ->count();
         $this->render();
+        $this->dispatch('apply-filters');
     }
 
 
@@ -228,7 +233,7 @@ class Table extends Component
     public function render()
     {
 
-       
+
         // Used for multiple select
         $related_tables = [];
 
@@ -316,11 +321,24 @@ class Table extends Component
         $rows = DB::table($this->table)->whereNull("$this->table.deleted_at")
             ->select($selects);
 
-        $rows = $this->setFilters($rows, $joins , $selects);
+
+            foreach($this->conditions as $condition){
+                switch($condition['type']){
+                    case 'having' : 
+                        $rows->having($condition['column'], $condition['operand'] , $condition['value']);
+                        break;
+                        default:
+                        $rows->where($condition['column'], $condition['operand'] , $condition['value']);
+                        break;
+                }
+            }
+
+        
+        $rows = $this->setFilters($rows, $joins, $selects);
 
 
         $joins = collect($joins)->unique()->values()->toArray();
-      
+
         foreach ($joins as $join) {
             $rows->leftJoin($join[0], $join[1], $join[2])
                 ->whereNull($join[0] . ".deleted_at");

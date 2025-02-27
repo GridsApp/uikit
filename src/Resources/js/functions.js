@@ -696,6 +696,29 @@ export default class Functions {
     };
   }
 
+
+
+  arraysEqualUnordered(arr1, arr2) {
+    // Check if arrays have the same length
+    if (arr1.length !== arr2.length) {
+        return false;
+    }
+
+    arr1 = arr1.map((element) => String(element));
+    arr2 = arr2.map((element) => String(element));
+
+    // Sort both arrays and compare each element
+    let sortedArr1 = arr1.slice().sort(); // slice() to avoid mutating the original arrays
+    let sortedArr2 = arr2.slice().sort();
+
+    for (let i = 0; i < sortedArr1.length; i++) {
+        if (sortedArr1[i] !== sortedArr2[i]) {
+            return false;
+        }
+    }
+
+    return true; // Arrays are equal (regardless of order)
+}
   initTable() {
     return {
         selected: [],
@@ -862,8 +885,9 @@ export default class Functions {
 
             const pageX =
                 window.innerWidth - rect.right + 0.75 * rect.width;
+                console.log(rect.width);
             const pageY = rect.top + window.pageYOffset + 0.5 * rect.height;
-
+            console.log(rect.height);
             let dataId = tdAction.parentElement.getAttribute("data-id");
 
             this.coordinates[dataId] = { x: pageX, y: pageY };

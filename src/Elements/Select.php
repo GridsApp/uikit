@@ -94,7 +94,20 @@ class Select extends Component
                     $options = collect($this->info['options']['list'])->map(function($item){
                         $item['identifier'] = $this->info['name'].'_'.$item['value'];
                         return $item;
-                    })->toArray();
+                    });
+
+                    if (!is_null($id)) {
+                        if (!is_array($id)) {
+                        
+                            $options = $options->where('value', $id)->first(); 
+                            $options = $options ? [$options] : [];
+                        } else {
+                          
+                            $options = $options->whereIn('value', $id)->toArray();
+                        }
+                    } else {
+                        $options = $options->toArray();
+                    }
                     break;
                     default :
                     $options = [];

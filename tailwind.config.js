@@ -6,6 +6,8 @@ module.exports = {
   content: [
     './src/**/*.php',
     './js/**/*.js',
+    "./src/Resources/**/*.blade.php",
+    "./src/Resources/**/*.js",
   ],
   darkMode: 'class',
   theme: {

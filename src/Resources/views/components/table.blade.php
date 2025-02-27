@@ -2,7 +2,7 @@
     <div class="twa-table-card ">
         <div class="twa-card-header ">
             <h3 class="twa-card-title">
-                Table
+                {{$title}}
             </h3>
             <div class="flex gap-5 items-center">
 
@@ -51,7 +51,8 @@
                             <tr>
 
                                 @foreach ($columns as $column)
-                                    @if ($column['type'] == twa\cmsv2\Entities\ColumnTypes\IdType::class)
+                                    {{-- @dd($column['type']); --}}
+                                    @if ($column['type'] == twa\uikit\Classes\ColumnTypes\IdType::class)
                                         <th class="w-[60px]">
                                             <input x-model="selectedAll" class="checkbox checkbox-sm"
                                                 @change="handleSelectAll" type="checkbox">
@@ -62,7 +63,7 @@
                                     </th>
                                 @endforeach
 
-                                @if (in_array(twa\cmsv2\Entities\ColumnTypes\IdType::class, array_column($columns, 'type')))
+                                @if (in_array(twa\uikit\Classes\ColumnTypes\IdType::class, array_column($columns, 'type')))
                                     <th class="w-[60px] actions">
                                         Actions
                                     </th>
@@ -87,7 +88,7 @@
                                     @foreach ($columns as $column)
                                         {{-- @dd($column); --}}
 
-                                        @if ($column['type'] == twa\cmsv2\Entities\ColumnTypes\IdType::class)
+                                        @if ($column['type'] == twa\uikit\Classes\ColumnTypes\IdType::class)
                                             <td>
                                                 <input class="checkbox checkbox-row" x-model="selected" type="checkbox"
                                                     value="{{ $i }}" @change="handleSelect">
@@ -124,7 +125,7 @@
                                     @endforeach
 
 
-                                    @if (in_array(twa\cmsv2\Entities\ColumnTypes\IdType::class, array_column($columns, 'type')))
+                                    @if (in_array(twa\uikit\Classes\ColumnTypes\IdType::class, array_column($columns, 'type')))
                                         <td class="td-actions"
                                             :class="checkTDActionsDisabled('{{ $i }}') ? 'disabled' : ''"
                                             id="td-actions-{{ $i }}" data-target="{{ $i }}">

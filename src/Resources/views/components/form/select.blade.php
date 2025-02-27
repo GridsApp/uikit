@@ -20,7 +20,7 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
                         @if ($info['multiple'])
                             <span class="twa-select-selection-box">
                         @endif
-                        <span x-text="selectedOption.label"></span>
+                        <span class="selected-class" x-text="selectedOption.label"></span>
                         @if ($info['multiple'])
                             <button @click="handleClearSelection($event, selectedOption.label)" type="button"
                                 role="button">
