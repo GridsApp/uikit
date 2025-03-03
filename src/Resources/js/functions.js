@@ -727,6 +727,7 @@ export default class Functions {
         coordinates: {},
         selectedAll: false,
         actionsActive: null,
+        openOptionsDropdown: false,
         allActions: [],
         actions: {
             allowEdit: true,
@@ -858,7 +859,7 @@ export default class Functions {
             return Object.values(actions).every((value) => value == false);
         },
 
-        handleBox(event, id) {
+        handleBox(event, id) {console.log("here");
             var tdAction = document.getElementById("td-actions-" + id);
 
             if (this.checkTDActionsDisabled(id)) {
@@ -885,9 +886,9 @@ export default class Functions {
 
             const pageX =
                 window.innerWidth - rect.right + 0.75 * rect.width;
-                console.log(rect.width);
+ 
             const pageY = rect.top + window.pageYOffset + 0.5 * rect.height;
-            console.log(rect.height);
+         
             let dataId = tdAction.parentElement.getAttribute("data-id");
 
             this.coordinates[dataId] = { x: pageX, y: pageY };
@@ -905,6 +906,11 @@ export default class Functions {
                 }, 0);
             }
         },
+
+        openDropdownOptions() {
+            this.openOptionsDropdown = !this.openOptionsDropdown;
+        },
+  
     };
 }
 
@@ -919,7 +925,6 @@ initFilter() {
       },
 
       initFilterItem(initSelected) {
-
           return {
               openDropdown: initSelected == 'true' || initSelected == 1,
               hideField2: false,

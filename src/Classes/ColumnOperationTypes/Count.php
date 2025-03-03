@@ -8,6 +8,7 @@ class Count extends ColumnOperationType
 {
 
     public function get(){
+  
         return DB::raw("COUNT($this->table.$this->field) as $this->alias");
     }
 

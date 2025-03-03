@@ -3,8 +3,6 @@
 namespace twa\uikit\FieldTypes;
 
 
-
-
 class Textfield extends FieldType
 {
 

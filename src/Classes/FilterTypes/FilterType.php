@@ -20,6 +20,8 @@ class FilterType
     }
 
     public function handle(&$rows , &$joins , $columns , $table ,  $filter , $filter_value){
+
+
         $value1 = $filter_value['value1'];
         $value2 = $filter_value['value2'];
 

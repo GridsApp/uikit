@@ -8,9 +8,10 @@ class Select extends FilterType
    
     public $field_type = \twa\uikit\FieldTypes\Select::class;
 
-   
+
     public function handle(&$rows , &$joins , $columns ,$table ,  $filter , $filter_value){
 
+       
 
         $column = "$table.".$filter['foreign_key'];
         $value1 = $filter_value['value1'];
@@ -21,7 +22,7 @@ class Select extends FilterType
                 $q->orWhere($column, 'LIKE',  '%"'.$value1.'"%');           
             });
         }else{
-           
+            // dd("here");
             $rows->where($column, $value1);
         }
 

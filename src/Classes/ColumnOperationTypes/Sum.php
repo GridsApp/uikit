@@ -8,7 +8,9 @@ class Sum extends ColumnOperationType {
 
 
     public function get(){
-        return DB::raw("SUM($this->table.$this->field) as $this->field");
+
+        // dd("here");
+        return DB::raw("SUM($this->table.$this->field) as $this->alias");
     }
 
 }

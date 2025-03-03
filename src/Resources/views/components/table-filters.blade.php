@@ -21,7 +21,7 @@
             </button>
         </div>
     @endif
-    <div x-show="open" @click.away="open = false" class="filter-dropdown-content absolute top-[55px]">
+    <div x-cloak x-show="open" @click.away="open = false" class="filter-dropdown-content absolute top-[45px]">
         <div class="head ">
             <div class="head-content">
                 <div>
@@ -37,7 +37,9 @@
             </div>
         </div>
         <div class="filter-box">
+            {{-- @dd($filters); --}}
             @foreach ($filters as $filter)
+          
                 @php
                     $initSelected = $this->filter[$filter['name']]['enabled'] ?? false ? true : false;
                 @endphp

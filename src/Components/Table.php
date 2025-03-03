@@ -6,12 +6,19 @@ use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
+use Illuminate\Database\Query\Expression;
 
 class Table extends Component
 {
     use WithPagination;
-
+    public $table_operations = [];
     public $columns = null;
+    public $row_operations = [];
+
+    public $sorting_column;
+    public $sorting_direction;
+
     public $table = null;
     public $slug = null;
     public $title = "";
@@ -24,26 +31,32 @@ class Table extends Component
 
     protected $queryString = [
         'filter' => ['except' => ''],
+        'sorting_column' => ['except' => ''],
+        'sorting_direction' => ['except' => '']
     ];
 
     public function mount()
     {
+
+
         $updated_filters = [];
 
         foreach ($this->filters as $filter) {
-
+           
             $class = new ($filter['type'])($filter);
+         
             $options = $class->options();
-
-            $default_option = collect($options)->where('active', true)->first()['value'] ?? null;
       
+            $default_option = collect($options)->where('active', true)->first()['value'] ?? null;
+ 
+     
             $operand_options_field = count($options) > 0 ? [
                 'id' => uniqid(),
                 'livewire' => [
                     'wire:model' => 'filter.{name}.option',
                 ],
                 'type' => \twa\uikit\FieldTypes\Select::class,
-                'label' => '',
+                'label' =>  $filter['label'],
                 'placeholder' => 'Select option',
                 'name' => $filter['name'],
                 'multiple' => false,
@@ -59,20 +72,23 @@ class Table extends Component
                 ]
             ] : null;
 
+            // dd($operand_options_field);
             $field1 = [
                 'id' => uniqid(),
                 'livewire' => [
                     'wire:model' => 'filter.{name}.value1',
                 ],
                 'type' => $class->field_type,
-                'label' => '',
+                'label' => $filter['label'],
                 'placeholder' => 'Select option',
                 'name' => $filter['name'],
                 'multiple' => false,
                 'visible_selections' => 3,
                 'query_limit' => 50,
-                'container' => 'col-span-12'
+            
             ];
+           
+            // dd($field1);
 
             $field2 = [
                 'id' => uniqid(),
@@ -96,6 +112,7 @@ class Table extends Component
                     'field' => $filter['column']
                 ];
             }
+         
 
             if (($filter['db_type'] ?? "") == "BOOLEAN") {
                 $this->filter[$filter['name']]['value1'] = (string) $this->filter[$filter['name']]['value1'];
@@ -103,14 +120,15 @@ class Table extends Component
             }
 
 
-      
-                $enabled = (string) ($this->filter[$filter['name']]['enabled'] ?? false);
-                $enabled = $enabled == "true" || $enabled == "1" ? true : false;
-        
 
-            if (($filter['relationship'] ?? '' == 'hasMany') && !collect($this->columns)->where('alias', $filter['column'])->first()) {
-                continue;
-            }
+            $enabled = (string) ($this->filter[$filter['name']]['enabled'] ?? false);
+            $enabled = $enabled == "true" || $enabled == "1" ? true : false;
+           
+
+            // if (($filter['relationship'] ?? '' == 'hasMany') && !collect($this->columns)->where('alias', $filter['column'])->first()) {
+            //     continue;
+            // }   
+            // dd($filter);
 
             $this->filter[$filter['name']] = [
                 'enabled' => $enabled,
@@ -118,6 +136,7 @@ class Table extends Component
                 'value1' => $this->filter[$filter['name']]['value1'] ?? null,
                 'value2' => $this->filter[$filter['name']]['value2'] ?? null
             ];
+        
 
             $this->emptyFilter[$filter['name']] = [
                 'enabled' => false,
@@ -126,6 +145,7 @@ class Table extends Component
                 'value2' =>  null
             ];
 
+          
 
             $updated_filters[] = [
                 'name' => $filter['name'],
@@ -141,13 +161,13 @@ class Table extends Component
                 'field2' => $field2,
             ];
         }
+        
 
         $this->filters = $updated_filters;
         $this->enabledFilterCount = collect($this->filter)
-        ->filter(fn($filter) => $filter['enabled'])
-        ->count();
+            ->filter(fn($filter) => $filter['enabled'])
+            ->count();
     }
-
 
     public function setFilters($rows, &$joins, $selects)
     {
@@ -155,6 +175,8 @@ class Table extends Component
 
         foreach ($this->filter as $column => $filter) {
 
+
+            // dd($filter);
 
             if (!$filter['enabled']) {
                 continue;
@@ -177,6 +199,7 @@ class Table extends Component
 
             $filter['value1'] = (string) $filter['value1'];
 
+           
 
             // dd($filter['value1']);
             // if($filter['value1'] == "null" || $filter['value1'] == ""){ continue; }
@@ -188,8 +211,6 @@ class Table extends Component
         return $rows;
     }
 
-    
-  
     public function clearFilters()
     {
         $this->reset(['filter']);
@@ -200,7 +221,6 @@ class Table extends Component
         // $this->resetPage();
     }
 
-
     public function applyFilters()
     {
         $this->enabledFilterCount = collect($this->filter)
@@ -210,12 +230,28 @@ class Table extends Component
         $this->dispatch('apply-filters');
     }
 
+    public function clearSorting()
+    {
+        $this->sorting_column = '';
+        $this->sorting_direction = '';
+        $this->render();
+    }
+
+    public function setSorting($column)
+    {
+
+        // dd($this->sorting_column);
+        if ($this->sorting_column === $column) {
+
+            $this->sorting_direction = $this->sorting_direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sorting_column = $column;
+            $this->sorting_direction = 'asc';
+        }
+    }
 
     public function buildSelect($names, $table, $alias, $seperator)
     {
-
-
-
         $select = "CONCAT(";
         foreach ($names as $i => $name) {
             if ($i == 0) {
@@ -229,12 +265,8 @@ class Table extends Component
         return $select;
     }
 
-
     public function render()
     {
-
-
-        // Used for multiple select
         $related_tables = [];
 
         $selects = [];
@@ -256,24 +288,23 @@ class Table extends Component
                 case 'manyToMany':
                     $related_tables[] = $column;
                     $select = $this->table . '.' . $column['foreign_key'];
-                    // $related_tables = [
-                    //     ['movie_casts' , 'cast_id'],
-                    //     ['movie_genres' , 'genre_id']
-                    // ];
-
+                  
                     break;
 
                 case 'belongsTo':
+                  
                     if (is_array($column['name'])) {
                         $select = DB::raw($this->buildSelect($column['name'], $column['table'],  $column['alias'], $column['separator'] ?? ' '));
                         $joins[] = [$column['table'],  "$this->table." . $column['foreign_key'],  $column['table'] . ".id"];
                     } else {
                         $select = $column['table'] . '.' . $column['name'];
-
+                    //    dd("here");
                         if (isset($column['alias']) && $column['alias']) {
                             $select .= " AS " . $column['alias'];
                         }
+                        $joins[] = [$column['table'], "$this->table." . $column['foreign_key'], $column['table'] . ".id"];
                     }
+        
                     break;
 
                 case 'hasMany':
@@ -284,7 +315,6 @@ class Table extends Component
                     break;
 
                 default:
-
                     if (is_array($column['name']) && !isset($column['callback'])) {
 
                         $select = DB::raw($this->buildSelect($column['name'], $this->table,  $column['alias'], $column['separator'] ?? ' '));
@@ -294,10 +324,8 @@ class Table extends Component
                         foreach ($column['name'] as $n) {
                             $ss[]  =  $this->table . '.' . $n;
                         }
-                        // $select = DB::raw($this->buildSelect($column['name'] , $this->table ,  $column['alias'], $column['separator'] ?? ' ' ));
-
-                        $selects = [...$selects, ...$ss];
-                        // continue;
+                   $selects = [...$selects, ...$ss];
+            
 
                     } else {
 
@@ -318,35 +346,59 @@ class Table extends Component
 
         $selects = collect($selects)->unique()->values()->toArray();
 
+
+
         $rows = DB::table($this->table)->whereNull("$this->table.deleted_at")
             ->select($selects);
 
 
-            foreach($this->conditions as $condition){
-                switch($condition['type']){
-                    case 'having' : 
-                        $rows->having($condition['column'], $condition['operand'] , $condition['value']);
-                        break;
-                        default:
-                        $rows->where($condition['column'], $condition['operand'] , $condition['value']);
-                        break;
-                }
+
+        foreach ($this->conditions as $condition) {
+            switch ($condition['type']) {
+                case 'having':
+                    $rows->having($condition['column'], $condition['operand'], $condition['value']);
+                    break;
+
+                case 'whereIn':
+                    $rows->whereIn($condition['column'], $condition['value']);
+                    break;
+
+                case 'whereNotIn':
+                    $rows->whereNotIn($condition['column'], $condition['value']);
+                    break;
+
+
+                default:
+                    $rows->where($condition['column'], $condition['operand'], $condition['value']);
+                    break;
             }
+        }
 
-        
+
         $rows = $this->setFilters($rows, $joins, $selects);
-
 
         $joins = collect($joins)->unique()->values()->toArray();
 
+        // dd($joins);
         foreach ($joins as $join) {
-            $rows->leftJoin($join[0], $join[1], $join[2])
-                ->whereNull($join[0] . ".deleted_at");
+            // $rows->leftJoin($join[0], $join[1], $join[2])
+            //     ->whereNull($join[0] . ".deleted_at");
+
+            $rows->leftJoin($join[0], function ($j) use ($join) {
+                $j->on($join[1], '=', $join[2])->whereNull($join[0] . ".deleted_at");
+            });
         }
 
+        // dd($column['group_column']);
+
+        $group_column = $this->columns[0]['group_column'] ?? 'id'; 
         if ($group_by) {
-            $rows->groupBy("$this->table.id");
+            // dd("here");
+            $rows->groupBy("$this->table.$group_column");
         }
+        // if ($group_by) {
+        //     $rows->groupBy("$this->table.id");
+        // }
 
 
         $tables = [];
@@ -355,7 +407,6 @@ class Table extends Component
                 return json_decode($item);
             })->flatten(1)->toArray())->get()->keyBy('id')->toArray();
         }
-
         /*
 
         collect(json_decode($row->{$column['alias']}))->map(function($item) use ($casts) { 
@@ -364,19 +415,45 @@ class Table extends Component
                                             })->toArray()
 
         */
+        // dd(request()->all());
+        // $available_sorting_columns = collect($selects)->map(function ($item) {
 
+
+        //     $array = preg_split("/\sas\s/i", $item);
+        //     //    dd($array);
+        //     if (isset($array[1])) {
+        //         return trim($array[1]);
+        //     }
+
+        //     return trim($array[0]);
+        // })->toArray();
+
+        // if (
+        //     !empty($this->sorting_column) &&
+        //     !empty($this->sorting_direction) &&
+        //     in_array(strtolower(trim($this->sorting_direction)), ['asc', 'desc']) &&
+        //     in_array(strtolower($this->sorting_column), $available_sorting_columns)
+
+        // ) {
+
+        //     $rows = $rows->orderBy($this->sorting_column, $this->sorting_direction);
+
+
+        // }
+        // $available_sorting_columns = collect($selects)->map(function ($item) {
+        //     if ($item instanceof Expression) {
+        //         $item = $item->getValue(DB::getQueryGrammar());
+        //     }
+        
+        //     $array = preg_split("/\sas\s/i", $item);
+        
+        //     return isset($array[1]) ? trim($array[1]) : trim($array[0]);
+        // })->toArray();
 
         $rows = $rows->paginate(20)->through(function ($row) use ($related_tables, $tables, $callbacks) {
-
-
-            // $new_row = json_decode(json_encode($row) , 1);
-
             $new_row = (array) $row;
 
             foreach ($callbacks as $callback) {
-
-
-
                 if (!is_array($callback['name'])) {
                     $cols = [$callback['name']];
                 } else {
@@ -385,13 +462,9 @@ class Table extends Component
 
                 $new_row[$callback['alias']] = ((new $callback['callback'])($row, ...$cols));
             }
-
-
             foreach ($related_tables as $related_table) {
 
                 $current_table = $related_table['table'];
-
-
                 $new_row[$related_table['alias']] = collect(json_decode($new_row[$related_table['foreign_key']]))->map(function ($item) use ($current_table, $tables, $related_table) {
 
                     $active_model = $tables[$current_table][$item];
