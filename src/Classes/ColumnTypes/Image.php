@@ -13,7 +13,7 @@ class Image extends DefaultType
         $this->input = $input;
     }
 
-    public function html(){
+    public function html($parameters = []){
         
 
         if(!(isset($this->input) && $this->input)){

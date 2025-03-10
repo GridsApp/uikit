@@ -10,10 +10,14 @@ class DefaultType
 
     public function __construct($input)
     {
+
+
+        
         $this->input = $input;
+
     }
 
-    public function html(){
+    public function html($parameters = []){
         return $this->input;
     }
 

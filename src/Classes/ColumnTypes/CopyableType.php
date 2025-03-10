@@ -3,7 +3,7 @@ namespace twa\uikit\Classes\ColumnTypes;
 
 class CopyableType extends DefaultType
 {
-    public function html()
+    public function html($parameters = [])
     {
         return '
         <div x-data="{ copied: false }">

@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class Date extends DefaultType
 {
-    public function html()
+    public function html($parameters = [])
     {
         if (!empty($this->input)) {
 

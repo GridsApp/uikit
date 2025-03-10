@@ -1,4 +1,4 @@
-{{-- <ul x-data="window.Functions.initToast()" @set-toasts-layout.window="toastLayout()" @toast-show.window="showToast()"
+<ul x-data="window.Functions.initToast()" @set-toasts-layout.window="toastLayout()" @toast-show.window="showToast()"
     @mouseenter="toastsHovered=true;" @mouseleave="toastsHovered=false" x-init="if (layout == 'expanded') { expanded = true; }
     stackToasts();
    "
@@ -70,7 +70,7 @@
             </span>
         </li>
     </template>
-</ul> --}}
+</ul>
 
 <div>
     

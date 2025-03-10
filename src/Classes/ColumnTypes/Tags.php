@@ -7,7 +7,7 @@ class Tags extends DefaultType
 {
 
 
-    public function html()
+    public function html($parameters = [])
     {
 
         if (!is_array($this->input)) {

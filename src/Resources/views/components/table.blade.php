@@ -48,7 +48,9 @@
                             <div>
                                 <a href="{{ $table_operation['link'] }}"
                                     class="text-[12px] h-[34px] focus:ring-offset-white focus:shadow-outline group inline-flex items-center justify-center gap-x-2 border outline-none transition-all duration-200 ease-in-out hover:shadow-sm focus:border-transparent focus:ring-2 disabled:cursor-not-allowed disabled:opacity-80 px-4 py-2 text-primary-50 ring-primary-500 bg-primary-500 focus:bg-primary-600 hover:bg-primary-600 border-transparent focus:ring-offset-2 dark:focus:ring-offset-dark-900 dark:focus:ring-primary-600 dark:bg-primary-700 dark:hover:bg-primary-600 dark:hover:ring-primary-600 rounded-md ">
-                                    <span>{!! $table_operation['icon'] ?? '' !!}</span> {{ $table_operation['label'] ?? '' }}
+                                    @if (isset($table_operation['icon']))
+                                        <span>{!! $table_operation['icon'] ?? '' !!}</span>
+                                    @endif {{ $table_operation['label'] ?? '' }}
                                 </a>
                             </div>
                         </template>
@@ -62,7 +64,7 @@
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
-                        <div x-cloak  x-show="openOptionsDropdown" @click.away="openOptionsDropdown = false"
+                        <div x-cloak x-show="openOptionsDropdown" @click.away="openOptionsDropdown = false"
                             class="options-dropdown-content absolute top-[45px]">
                             <div class="options-box">
                                 @foreach ($table_operations as $index => $table_operation)
@@ -95,30 +97,33 @@
                         <thead>
                             <tr>
                                 @foreach ($columns as $column)
+                                    {{-- @dd($column) --}}
                                     @if ($column['type'] == twa\uikit\Classes\ColumnTypes\IdType::class)
                                         <th class="w-[60px]">
                                             <input x-model="selectedAll" class="checkbox checkbox-sm"
                                                 @change="handleSelectAll" type="checkbox">
                                         </th>
                                     @endif
-                                    <th x-on:dblclick="$wire.clearSorting()"
-                                        wire:click="setSorting('{{ $column['alias'] }}')" class="cursor-pointer">
-                                        {{ $column['label'] }}
-                                        @if ($sorting_column === $column['alias'])
-                                            @if ($sorting_direction === 'asc')
-                                                ↑
-                                            @else
-                                                ↓
+                                    @if ($column['type'] !== twa\uikit\Classes\ColumnTypes\Hidden::class)
+                                        <th x-on:dblclick="$wire.clearSorting()"
+                                            wire:click="setSorting('{{ $column['alias'] }}')" class="cursor-pointer">
+                                            {{ $column['label'] }}
+                                            @if ($sorting_column === $column['alias'])
+                                                @if ($sorting_direction === 'asc')
+                                                    ↑
+                                                @else
+                                                    ↓
+                                                @endif
                                             @endif
-                                        @endif
-                                    </th>
+                                        </th>
+                                    @endif
                                 @endforeach
 
-                                {{-- @if (in_array(twa\uikit\Classes\ColumnTypes\IdType::class, array_column($columns, 'type'))) --}}
+                                @if (in_array(twa\uikit\Classes\ColumnTypes\IdType::class, array_column($columns, 'type')))
                                     <th class="w-[60px] actions">
                                         Actions
                                     </th>
-                                {{-- @endif --}}
+                                @endif
 
                             </tr>
                         </thead>
@@ -129,13 +134,12 @@
                                 @php
                                     $idColumn = collect($columns)->where('name', 'id')->first();
 
-                            //  dd($idColumn);
+                                    //  dd($idColumn);
                                     if ($idColumn) {
                                         $i = $row->{$idColumn['alias']};
                                     } else {
-
                                         // dd($tableIndex);
-                                        $i = $tableIndex +1;
+                                        $i = $tableIndex + 1;
                                     }
 
                                 @endphp
@@ -154,38 +158,21 @@
                                                     value="{{ $i }}" @change="handleSelect">
                                             </td>
                                         @endif
-
+                                        @if ($column['type'] !== twa\uikit\Classes\ColumnTypes\Hidden::class)
                                         <td>
 
 
 
-                                            {!! (new ($column['type'])($row->{$column['alias']}))->html() !!}
+                                            {!! (new ($column['type'])($row->{$column['alias']}))->html($column['parameters'] ?? []) !!}
 
 
-                                            {{--                 
-                                            @if (is_array($row->{$column['alias']}))
-                                            <div class="flex gap-1 items-center">
-                                                @foreach ($row->{$column['alias']} as $item)
-
-
-                                                <div class="twa-table-td-select"><span>  {{$item}}</span> </div>
-
-                                                @endforeach
-                                            </div>
-
-                                            @else
-
-                                            {{ $row->{$column['alias']} }}
-
-                                            @endif --}}
-
-
-
+                         
                                         </td>
+                                        @endif
                                     @endforeach
 
 
-                                    {{-- @if (in_array(twa\uikit\Classes\ColumnTypes\IdType::class, array_column($columns, 'type'))) --}}
+                                    @if (in_array(twa\uikit\Classes\ColumnTypes\IdType::class, array_column($columns, 'type')))
                                         <td class="td-actions"
                                             :class="checkTDActionsDisabled('{{ $i }}') ? 'disabled' : ''"
                                             id="td-actions-{{ $i }}" data-target="{{ $i }}">
@@ -196,7 +183,7 @@
                                                 <i class="fa-regular fa-ellipsis-vertical"></i>
                                             </a>
                                         </td>
-                                    {{-- @endif --}}
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -234,7 +221,7 @@
                 {{ $rows->onEachSide(2)->links("vendor.pagination.tailwind") }}
             </div> --}}
 
-            
+
         </div>
     </div>
 
@@ -244,15 +231,15 @@
         x-show="actionsActive != null" x-cloak @click.away= "handleClickAway" class="dropdown-content">
 
         @foreach ($row_operations as $row_operation)
-    {{-- @dd( $row_operation['link']); --}}
-            <div x-cloak  x-show="actions.allowEdit" class="dropdown-menu-item">
+            {{-- @dd( $row_operation['link']); --}}
+            <div x-cloak x-show="actions.allowEdit" class="dropdown-menu-item">
                 <a :href="'{{ $row_operation['link'] }}'.replace('{id}', actionsActive)" class="dropdown-menu-link">
                     <span class="dropdown-menu-icon">{!! $row_operation['icon'] !!}</span>
                     <span class="dropdown-menu-title">{{ $row_operation['label'] }}</span>
                 </a>
             </div>
         @endforeach
-        <div x-cloak  x-show="actions.allowDelete" class="dropdown-menu-item" x-data="{ showModal: false, handleOpen() { this.showModal = true } }"
+        <div x-cloak x-show="actions.allowDelete" class="dropdown-menu-item" x-data="{ showModal: false, handleOpen() { this.showModal = true } }"
             @click.away="showModal = false" @click="handleOpen">
             <div class="dropdown-menu-link">
                 <span class="dropdown-menu-icon"> <i class="fa-solid fa-trash-can"></i></span>
@@ -280,7 +267,7 @@
     </div>
 
 
-  
-    
+
+
     <br>
 </div>

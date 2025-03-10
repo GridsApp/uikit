@@ -13,7 +13,7 @@ class Images extends DefaultType
         $this->input = $input;
     }
 
-    public function html()
+    public function html($parameters = [])
     {
 
         if (!is_array($this->input)) {
