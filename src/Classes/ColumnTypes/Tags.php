@@ -14,9 +14,11 @@ class Tags extends DefaultType
             $this->input = [$this->input];
         }
 
-        $count= count($this->input);
-        
+        if (empty($this->input)) {
+            return ''; 
+        }
 
+        $count= count($this->input);
         $nb = 1;
 
         $html = "<div class='flex gap-1 items-center'>";
@@ -25,6 +27,11 @@ class Tags extends DefaultType
             $html .= "<div class='twa-table-td-select'><span>$input</span></div>";
         }
 
+        if ($count > $nb) {
+            $html .= "<div class='twa-table-td-select'><span>+" . ($count - $nb) . " more</span></div>";
+        }
+
+        
 
         // if ($count > 0) {
 

@@ -14,9 +14,9 @@ class Tag extends DefaultType
             $this->input = [$this->input];
         }
 
-        $html = "<div class='twa-table-td-select'><span>{$this->input[0]}</span></div>";
-
-
-        return $html;
+        if (!empty($this->input[0])) {
+            return "<div class='twa-table-td-select'><span>{$this->input[0]}</span></div>";
+        }
+        return ''; 
     }
 }
