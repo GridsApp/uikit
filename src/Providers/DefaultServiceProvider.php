@@ -35,9 +35,9 @@ class DefaultServiceProvider extends ServiceProvider{
         
         // $this->loadScriptAndStyles();
 
-        $this->publishes([
-            __DIR__.'/../Config/fields.php' => config_path('fields.php'),
-        ], 'laravel-assets');
+        // $this->publishes([
+        //     __DIR__.'/../Config/fields.php' => config_path('fields.php'),
+        // ], 'laravel-assets');
 
     }
 
