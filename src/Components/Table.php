@@ -250,6 +250,9 @@ class Table extends Component
 
     public function render()
     {
+
+
+        
         $related_tables = [];
 
         $selects = [];
@@ -267,9 +270,14 @@ class Table extends Component
 
 
 
-            if(isset($column['conditions']) && !isset($column['relationship']) ){
-               $this->conditions = [...$this->conditions ,...$column['conditions']];
-            }
+
+            // if (isset($column['conditions']) && !isset($column['relationship'])) {
+    
+            //     $this->conditions = [...$this->conditions, ...$column['conditions']];
+            //     dd($this->conditions);
+            // }
+
+
 
             if ($column['callback'] ?? null) {
                 $callbacks[]  = $column;
@@ -296,8 +304,10 @@ class Table extends Component
                         if (isset($column['alias']) && $column['alias']) {
                             $select .= " AS " . $column['alias'];
                         }
-                        $joins[] = [$column['table'], "$this->table." . $column['foreign_key'], $column['table'] . ".id"];
+                        $joins[] = [$column['table'], "$this->table." . $column['foreign_key'], $column['table'] . ".id" , $column['conditions'] ?? []];
                     }
+
+
 
                     break;
 
@@ -315,56 +325,56 @@ class Table extends Component
 
                 case 'polyBelongsTo':
 
-                    
-                        $id_column = $column['foreign_key'];
-                        $type_column = $column['foreign_type'];
 
-                        // $type = $this->table . '.' . $type_column;
-                        // $model_class = $column['model'] ?? DB::table($this->table)->value($type);
-                        // if (class_exists($model_class)) {
+                    $id_column = $column['foreign_key'];
+                    $type_column = $column['foreign_type'];
 
-
-                        
-                           foreach($column["foreign_types"] ?? [] as $foreign_type => $field){
-                            $model = new $foreign_type;
-                            $related_table = $model->getTable();
-
-                            $related_tables[] = [
-                                'table' => $related_table,
-                                'foreign_key' => $id_column,
-                                'foreign_type' => $type_column,
-                                'name' => $field,
-                                'type' => 'polymorphic',
-                                'alias' => $column['alias']
-                            ];                           
-                            // $selects [] = $related_table . '.' . $field; 
-
-                           }
+                    // $type = $this->table . '.' . $type_column;
+                    // $model_class = $column['model'] ?? DB::table($this->table)->value($type);
+                    // if (class_exists($model_class)) {
 
 
-                            // $plymorphic_tables [] = [
-                            //     'table' => $related_table,
-                            //     'name' => $field,
-                            // ];
 
-       
-                           $selects [] = $this->table . '.' . $id_column;
-                           $selects [] = $this->table . '.' . $type_column;
+                    foreach ($column["foreign_types"] ?? [] as $foreign_type => $field) {
+                        $model = new $foreign_type;
+                        $related_table = $model->getTable();
 
-                 
+                        $related_tables[] = [
+                            'table' => $related_table,
+                            'foreign_key' => $id_column,
+                            'foreign_type' => $type_column,
+                            'name' => $field,
+                            'type' => 'polymorphic',
+                            'alias' => $column['alias']
+                        ];
+                        // $selects [] = $related_table . '.' . $field; 
 
-                     
-                        // }
+                    }
 
-                       
 
-                        // if (isset($column['alias']) && $column['alias']) {
-                        //     $select .= " AS " . $column['alias'];
-                        // }
-                        // $joins[] = [$related_table, "$this->table.$id_column", "$related_table.id"];
+                    // $plymorphic_tables [] = [
+                    //     'table' => $related_table,
+                    //     'name' => $field,
+                    // ];
 
-                
-                    
+
+                    $selects[] = $this->table . '.' . $id_column;
+                    $selects[] = $this->table . '.' . $type_column;
+
+
+
+
+                    // }
+
+
+
+                    // if (isset($column['alias']) && $column['alias']) {
+                    //     $select .= " AS " . $column['alias'];
+                    // }
+                    // $joins[] = [$related_table, "$this->table.$id_column", "$related_table.id"];
+
+
+
 
                     break;
                 default:
@@ -405,6 +415,11 @@ class Table extends Component
         // dd($related_tables);
 
 
+    
+  
+        
+
+
         $selects = collect($selects)->unique()->filter()->values()->toArray();
 
 
@@ -414,8 +429,10 @@ class Table extends Component
 
 
 
+            
         foreach ($this->conditions as $condition) {
 
+            
             $condition['operand'] = $condition['operand'] ?? '=';
 
             switch ($condition['type']) {
@@ -431,18 +448,33 @@ class Table extends Component
                     $rows->whereNotIn($condition['column'], $condition['value']);
                     break;
 
+                case 'whereNotNull':
+
+                    // dd($condition['column']);
+                    $rows->whereNotNull($condition['column']);
+                    break;
                 case 'like':
                     $rows->where($condition['column'], 'LIKE', '%' . $condition['value'] . '%');
                     break;
 
 
-
+                case 'whereNull':
+                   
+                    $rows->whereNull($condition['column']);
+                    break;
 
                 default:
+
+              
+                
+
+      
                     $rows->where($condition['column'], $condition['operand'], $condition['value']);
                     break;
             }
         }
+
+        // dd($rows);
 
 
         $rows = $this->setFilters($rows, $joins, $selects);
@@ -451,14 +483,24 @@ class Table extends Component
 
 
 
+        $already_joined = [];
+
 
         foreach ($joins as $join) {
 
-            // dd($join);
+            if(in_array($join[0] , $already_joined)){
+                continue;
+            }
+
+            $already_joined  [] = $join[0];
+
+            // dump("here");
 
             $rows->leftJoin($join[0], function ($j) use ($join) {
                 $j->on($join[1], '=', $join[2])
                     ->whereNull($join[0] . ".deleted_at");
+
+                   
                 foreach ($join[3] ?? [] as $condition) {
 
                     $condition['operand'] =  $condition['operand'] ?? '=';
@@ -472,34 +514,34 @@ class Table extends Component
         }
 
 
+        // dd($rows);
+
+        // dd($rows->get());
+   
+
         if ($group_by) {
 
-            if(is_array($group_column)){
-                $group_arr = collect($group_column)->map(function($item){
+            if (is_array($group_column)) {
+                $group_arr = collect($group_column)->map(function ($item) {
 
-                    if(str($item)->contains(".")){
+                    if (str($item)->contains(".")) {
                         return $item;
-                    }else{
+                    } else {
                         return "$this->table.$item";
                     }
-
-                    
                 })->toArray();
 
-              
+
                 // dd($group_arr);
                 $rows->groupBy(...$group_arr);
+            } else {
 
-            }else{
-
-                if(str($group_column)->contains(".")){
+                if (str($group_column)->contains(".")) {
                     $rows->groupBy($group_column);
-                }else{
+                } else {
                     $rows->groupBy("$this->table.$group_column");
                 }
             }
-
-           
         }
 
         $tables = [];
@@ -539,27 +581,31 @@ class Table extends Component
         }
 
 
+
+        // dd($rows->toSql());
+
+
         $rows = $rows->paginate(20)->through(function ($row) use ($related_tables, $tables, $callbacks) {
             $new_row = (array) $row;
 
             // dd($new_row , $tables);
 
 
-            
+
             $res = [];
 
-            foreach($this->columns as $column){
+            foreach ($this->columns as $column) {
                 // dd($column);
 
                 $column['relationship'] = $column['relationship'] ?? null;
 
-                switch($column['relationship']){
+                switch ($column['relationship']) {
 
 
-                    case 'manyToMany' : 
+                    case 'manyToMany':
 
 
-           
+
 
                         break;
 
@@ -569,18 +615,17 @@ class Table extends Component
 
                         $input_column = $column["foreign_types"][$new_row[$column['foreign_type']]];
                         // dd($input_column);
-                        $res[$column['alias']] = $input_column['color'] .'$$$'.
-                        ($tables[$table][$new_row[$column['foreign_key']]]->{$input_column['field']});
-                
+                        $res[$column['alias']] = $input_column['color'] . '$$$' .
+                            ($tables[$table][$new_row[$column['foreign_key']]]->{$input_column['field']});
+
                         // dd($res[$column['alias']]);
 
                         break;
 
-                    default: 
+                    default:
 
-                    $res[$column['alias']] = $new_row[$column['alias']]; 
+                        $res[$column['alias']] = $new_row[$column['alias']];
                 }
-
             }
 
 
@@ -599,19 +644,19 @@ class Table extends Component
                 $res[$callback['alias']] = ((new $callback['callback'])($row, ...$cols));
             }
 
-       
+
             foreach ($related_tables as $related_table) {
-            
+
                 $current_table = $related_table['table'];
 
-                if($related_table["type"] ?? '' == "polymorphic"){
+                if ($related_table["type"] ?? '' == "polymorphic") {
                     continue;
                 }
-     
-   
+
+
                 // TO BE OPTIMIZED
-           
-               $res[$related_table['alias']] = collect(json_decode($new_row[$related_table['foreign_key']]))->map(function ($item) use ($current_table, $tables, $related_table) {
+
+                $res[$related_table['alias']] = collect(json_decode($new_row[$related_table['foreign_key']]))->map(function ($item) use ($current_table, $tables, $related_table) {
                     $active_model = $tables[$current_table][$item];
                     $separator = $related_table['separator'] ?? ' ';
                     if (is_array($related_table['name'])) {

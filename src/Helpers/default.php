@@ -71,6 +71,50 @@ function get_field_modal($field)
     }
 
 
+    function apply_condition(&$rows , $condition){
+         
+        $condition['operand'] = $condition['operand'] ?? '=';
+
+        switch ($condition['type']) {
+            case 'having':
+                $rows->having($condition['column'], $condition['operand'], $condition['value']);
+                break;
+
+            case 'whereIn':
+                $rows->whereIn($condition['column'], $condition['value']);
+                break;
+
+            case 'whereNotIn':
+                $rows->whereNotIn($condition['column'], $condition['value']);
+                break;
+
+            case 'whereNotNull':
+
+                $rows->whereNotNull($condition['column']);
+                break;
+            case 'like':
+
+                $rows->where($condition['column'], 'LIKE', '%' . $condition['value'] . '%');
+                break;
+
+            case 'whereNull':
+               
+                $rows->whereNull($condition['column']);
+                break;
+
+            default:
+
+
+         
+
+                $rows->where($condition['column'], $condition['operand'], $condition['value']);
+            
+                break;
+        }
+
+    }
+
+
     function get_assets(){
         return collect(json_decode(file_get_contents(__DIR__.'/../../dist/.vite/manifest.json'), true))->map(function($item){
             return "vendor/twa/uikit/dist/".$item['file'];

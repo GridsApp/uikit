@@ -26,11 +26,7 @@ class DefaultServiceProvider extends ServiceProvider{
 
 
         Livewire::component('components.table',\twa\uikit\Components\Table::class);
-
-
-
-
-
+        Livewire::component('components.table-grid',\twa\uikit\Components\TableGrid::class);
 
         
         // $this->loadScriptAndStyles();

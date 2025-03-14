@@ -4,14 +4,15 @@ namespace twa\uikit\Classes\ColumnOperationTypes;
 
 use Illuminate\Support\Facades\DB;
 
-class Count extends ColumnOperationType
+class Count extends DefaultOperationType
 {
 
     public function get(){
-  
-        return DB::raw("COUNT($this->table.$this->field) as $this->alias");
-    }
+        
+        $arg = func_get_arg(0);
 
+        return DB::raw("COUNT($arg) as $this->alias");
+    }
 
     
 

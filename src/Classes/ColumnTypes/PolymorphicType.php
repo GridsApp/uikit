@@ -10,9 +10,15 @@ class PolymorphicType extends DefaultType
     public function html($parameters = [])
     {
 
+        if(!str($this->input)->contains('$$$')){
+            return $this->input;
+        }
+
+
         $input = str($this->input)->explode('$$$');
 
         
+
 
 
 

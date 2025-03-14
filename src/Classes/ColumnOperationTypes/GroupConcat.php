@@ -4,25 +4,17 @@ namespace twa\uikit\Classes\ColumnOperationTypes;
 
 use Illuminate\Support\Facades\DB;
 
-class GroupConcat extends ColumnOperationType
+class GroupConcat extends DefaultOperationType
 {
 
-    public $separator;
-
-    public function __construct($table , $field , $alias , $separator)
-    {
-        $this->table = $table;
-        $this->field = $field;
-        $this->alias = $alias;
-        $this->separator = $separator;
-    }
-   
+    
     public function get(){
-        // return DB::raw("SUM($this->table.$this->field) as $this->field");
 
-        $this->separator = ', ';
+        $arg = func_get_arg(0);
+        
+        $separator = $this->attributes['separator'] ?? ', ';
 
-        return DB::raw("GROUP_CONCAT($this->table.$this->field SEPARATOR ', ') as $this->alias");
+        return DB::raw("GROUP_CONCAT($arg SEPARATOR $separator) as $this->alias");
     }
 
 
