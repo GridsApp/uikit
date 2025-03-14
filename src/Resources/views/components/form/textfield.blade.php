@@ -1,6 +1,6 @@
 
  <div x-data="Functions.initTextField('{{ $info['channel'] ?? '' }}')" @if (isset($info['channel_type']) && $info['channel_type'] == 'receiver') x-on:{{ $info['channel'] }}.window="handleSlug" @endif>
- 
+
  {{-- @dd(!(isset($info['translatable']) && $info['translatable']) && get_field_modal($info) ?? 'value') --}}
     <label class="twa-form-label">
         {{ $info['label'] }}
@@ -18,7 +18,7 @@
                     x-on:input="handleInput" @endif
             @else @if (isset($info['channel_type']) && $info['channel_type'] == 'sender') x-on:input="handleInput" @endif @endif
 
-            tabindex="{{ $info['index'] }}" wire:model="value" type="text"
+            tabindex="{{ $info['index'] }}" wire:model="value" type="text"  @if($info['autofocus'] ?? null)  x-init="$el.focus()" @endif
             class="twa-form-input  ">
         </div>
     </div>
