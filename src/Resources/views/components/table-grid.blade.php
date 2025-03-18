@@ -267,7 +267,8 @@
                         'action' => [
                             'label' => "'Delete'",
                             'type' => 'danger',
-                            'handler' => 'handleDelete',
+                            'handler' => 'handleDelete'
+                            
                         ],
                     ])
                         <div class="text-[13px] font-medium text-left text-gray-800 p-5">

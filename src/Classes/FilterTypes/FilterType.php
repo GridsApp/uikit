@@ -21,8 +21,8 @@ class FilterType
 
     public function handle(&$rows , &$joins , $columns , $table ,  $filter , $filter_value){
 
-
         $value1 = $filter_value['value1'];
+
         $value2 = $filter_value['value2'];
 
         switch($filter['db_type']){
@@ -41,15 +41,12 @@ class FilterType
                 }
             
         }
-
-
-       
-          
-
-        
+    
         switch ($filter['relationship']) {
+
+
             case 'manyToMany':
-             
+         
                 $column = "$table.".$filter['foreign_key'];
 
                 $temp_rows =  DB::table($filter['table']);
@@ -104,9 +101,9 @@ class FilterType
                 break;
             
             default:
-            
-                $column = "$table.".$filter['column'];
+            // dd($table,$filter['column']);
 
+                $column = "$table.".$filter['column'];
                 $this->filter($rows, $filter_value['option'], $column, $value1 , $value2);
 
                 break;

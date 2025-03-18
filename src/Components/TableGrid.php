@@ -2,6 +2,7 @@
 
 namespace twa\uikit\Components;
 
+use App\Traits\ToastTrait;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
@@ -11,9 +12,10 @@ use Illuminate\Database\Query\Expression;
 
 class TableGrid extends Component
 {
-    use WithPagination;
+    use WithPagination, ToastTrait;
 
     public $table_operations = [];
+    public $grid_rules = [];
     public $columns = null;
     public $row_operations = [];
 
@@ -41,7 +43,8 @@ class TableGrid extends Component
        $this->filters =  $this->table["filters"];
        $this->columns =  $this->table["columns"];
        $this->table_operations = $this->table['table_operations'];
-
+      
+  
        $updated_filters = [];
 
         foreach ($this->filters as $filter) {
@@ -161,6 +164,11 @@ class TableGrid extends Component
             ->filter(fn($filter) => $filter['enabled'])
             ->count();
 
+
+
+   
+    
+
     }
 
     public function setFilters($rows, &$joins, $selects)
@@ -171,28 +179,35 @@ class TableGrid extends Component
                 continue;
             }
 
+
+       
             $current_filter = collect($this->filters)->where('name', $column)->first();
 
             if (!$current_filter) {
                 continue;
             }
-
+ 
             $current_filter['relationship'] = $current_filter['relationship'] ?? null;
-
+   
 
             if (!isset($filter['value1'])) {
                 $filter['value1'] = null;
-            }
+            }        
 
             $filter['value1'] = (string) $filter['value1'];
-
-
-            (new ($current_filter['type']))->handle($rows, $joins, $this->columns, $this->table, $current_filter, $filter);
+     
+            // dd($current_filter['type']);
+            try {
+                (new ($current_filter['type']))->handle($rows, $joins, $this->columns, $this->table, $current_filter, $filter);
+                dd("hereeee"); 
+            } catch (\Throwable $e) {
+                dd($e->getMessage(), $e->getTraceAsString());
+            }
         }
 
         return $rows;
     }
-
+ 
     public function clearFilters()
     {
         $this->reset(['filter']);
@@ -205,6 +220,8 @@ class TableGrid extends Component
 
     public function applyFilters()
     {
+
+     
         $this->enabledFilterCount = collect($this->filter)
             ->filter(fn($filter) => $filter['enabled'])
             ->count();
@@ -270,12 +287,12 @@ class TableGrid extends Component
 
         $selects = collect($selects)->unique()->filter()->values()->toArray();
 
-
+    
        
         // dd($this->table['selects']);
        
         $rows = DB::table($this->table['name'])->select($selects)->whereNull($this->table['name'].".deleted_at");
-              
+
         foreach ($this->table["conditions"] ?? [] as $condition) {
             apply_condition($rows , $condition);
         }
@@ -283,7 +300,7 @@ class TableGrid extends Component
 
 
         $rows = $this->setFilters($rows, $joins, $selects);
-
+   
     
         foreach ($this->table["relationships"] as $relation_table => $relationship) {
 
@@ -454,6 +471,34 @@ class TableGrid extends Component
         return view('UIKitView::components.table-grid', ['rows' => $rows]);
     }
 
+
+
+    public function handleDelete($selected)
+    {
+        if (!is_array($selected)) {
+            $selected = json_decode($selected, true);
+        }
     
-   
+        if (!is_array($selected) || empty($selected)) {
+            $this->sendError("Error", "Invalid selection.");
+           
+        }
+
+        dd($selected);
+    
+        try {
+            DB::table($this->table['name'])->whereIn('id', $selected)->update([
+                'deleted_at' =>  now()
+            ]);
+
+        
+            $this->sendSuccess("Deleted", "Record(s) successfully deleted.");
+            $this->render(); 
+    
+        } catch (\Throwable $e) {
+            dd($e);
+            $this->sendError("Error", "Could not delete records.");
+        }
+    }
+    
 }

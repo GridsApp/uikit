@@ -97,6 +97,8 @@ class TableData
     }
 
 
+
+
     public function addCondition($type, $column, $value = null, $operand = '=')
     {
 
@@ -249,7 +251,8 @@ class TableData
             'group' => $this->group,
             'columns' => $this->columns,
             'filters' => $this->filters,
-            'table_operations' => $this->table_operations
+            'table_operations' => $this->table_operations,
+       
 
         ];
     }
