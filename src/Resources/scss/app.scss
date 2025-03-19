@@ -203,3 +203,12 @@ input[type="number"] {
         padding-left: 0 !important;
     }
 }
+
+.twa-table-td-color {
+    @apply flex gap-2 items-center;
+    .td-color {
+        @apply h-4 w-4 rounded shadow;
+    }
+    .text {
+    }
+}

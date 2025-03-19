@@ -10,6 +10,10 @@ class Tags extends DefaultType
     public function html($parameters = [])
     {
 
+        if(json_validate($this->input)){
+            $this->input = json_decode($this->input , 1);
+        }
+
         if (!is_array($this->input)) {
             $this->input = [$this->input];
         }

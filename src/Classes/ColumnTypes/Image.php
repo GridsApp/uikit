@@ -19,7 +19,9 @@ class Image extends DefaultType
         if(!(isset($this->input) && $this->input)){
             return "<div class='twa-table-td-image placeholder'><i class='fa-duotone fa-solid fa-image'></i></div>";
         }
-        return "<div class='twa-table-td-image'><img class='td-image' src='$this->input'></div>";
+        return "<div class='twa-table-td-image'><img class='td-image' src='".get_image($this->input)."'></div>";
+
+        // return "<div class='twa-table-td-image'><img class='td-image' src='$this->input'></div>";
 
     }
 

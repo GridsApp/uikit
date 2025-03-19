@@ -18,6 +18,23 @@ class FileUpload extends FieldType
         $table->text($this->field['name'])->nullable();
     }
 
+
+
+
+    public function columnType()
+    {
+       
+        if (isset($this->field['multiple']) &&  $this->field['multiple']) {
+            return \twa\uikit\Classes\ColumnTypes\Images::class;
+        }
+    
+        return \twa\uikit\Classes\ColumnTypes\Image::class;
+    }
+
+
+
+
+
     public function value($form){
 
 

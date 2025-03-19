@@ -59,7 +59,9 @@
                     @endif
                 @endforeach
 
+         
                 @if (count($table_operations) > 1)
+             
                     <div class="options-dropdown-container">
                         <div class="options-dropdown-container-header">
                             <button class="options-dropdown-button" @click="openDropdownOptions">
@@ -121,7 +123,7 @@
                                     @endif
                                 @endforeach
 
-                                @if (in_array(twa\uikit\Classes\ColumnTypes\IdType::class, array_column($columns, 'type')))
+                                @if ($rows[0]->id ?? null)
                                     <th class="w-[60px] actions">
                                         Actions
                                     </th>
@@ -132,18 +134,16 @@
 
                         <tbody>
                             @foreach ($rows as $tableIndex => $row)
-                                {{-- @dd($row); --}}
+                        
                                 @php
-                                    $idColumn = collect($columns)->where('name', 'id')->first();
-
-                                    //  dd($idColumn);
-                                    if ($idColumn) {
-                                        $i = $row->{$idColumn['alias']};
+                    
+                                    if ($row->id ?? null) {
+                                        $i = $row->id;
                                     } else {
-                                        // dd($tableIndex);
                                         $i = $tableIndex + 1;
                                     }
 
+                                  
                                 @endphp
 
                                 <tr wire:key="key_{{ $i }}" data-id="{{ $i }}">
@@ -168,16 +168,10 @@
 
 
                                         
-                                            @if($row->{$column['alias']} ?? null)
+                                         
 
 
                                             {!! (new ($column['type'])($row->{$column['alias']} , $row))->html($column['parameters'] ?? []) !!}
-
-                                            @else
-
-                                            -
-
-                                            @endif
 
                          
                                         </td>
@@ -185,7 +179,7 @@
                                     @endforeach
 
 
-                                    @if (in_array(twa\uikit\Classes\ColumnTypes\IdType::class, array_column($columns, 'type')))
+                                    @if ($row->id ?? null)
                                         <td class="td-actions"
                                             :class="checkTDActionsDisabled('{{ $i }}') ? 'disabled' : ''"
                                             id="td-actions-{{ $i }}" data-target="{{ $i }}">
@@ -195,6 +189,11 @@
                                                 @click="handleBox(event , '{{ $i }}')">
                                                 <i class="fa-regular fa-ellipsis-vertical"></i>
                                             </a>
+
+
+                                            {{-- @include('UIKitView::components.row-operations' , ['index' => $i]) --}}
+
+
                                         </td>
                                     @endif
                                 </tr>
@@ -238,48 +237,18 @@
         </div>
     </div>
 
-    <div :style="actionsActive ? 'position:absolute; right: ' + coordinates[actionsActive]?.x + 'px;top:' + coordinates[
-            actionsActive]
-        ?.y + 'px' : ''"
-        x-show="actionsActive != null" x-cloak @click.away= "handleClickAway" class="dropdown-content">
 
-        @foreach ($row_operations as $row_operation)
-            {{-- @dd( $row_operation['link']); --}}
-            <div x-cloak x-show="actions.allowEdit" class="dropdown-menu-item">
-                <a :href="'{{ $row_operation['link'] }}'.replace('{id}', actionsActive)" class="dropdown-menu-link">
-                    <span class="dropdown-menu-icon">{!! $row_operation['icon'] !!}</span>
-                    <span class="dropdown-menu-title">{{ $row_operation['label'] }}</span>
-                </a>
-            </div>
-        @endforeach
-        <div x-cloak x-show="actions.allowDelete" class="dropdown-menu-item" x-data="{ showModal: false, handleOpen() { this.showModal = true } }"
-            @click.away="showModal = false" @click="handleOpen">
-            <div class="dropdown-menu-link">
-                <span class="dropdown-menu-icon"> <i class="fa-solid fa-trash-can"></i></span>
+    {{-- <input type="text" x-model="actionsActive" /> --}}
 
-                <div>
+    @foreach($rows as $i => $row)
 
-                    <span class="dropdown-menu-title">Delete Record</span>
 
-                    @component('UIKitView::components.modal', [
-                        'title' => 'Delete',
-                        'variable' => 'showModal',
-                        'action' => [
-                            'label' => "'Delete'",
-                            'type' => 'danger',
-                            'handler' => 'handleDelete'
-                            
-                        ],
-                    ])
-                        <div class="text-[13px] font-medium text-left text-gray-800 p-5">
-                            Are you sure you want to delete records?
-                        </div>
-                    @endcomponent
-                </div>
-            </div>
-        </div>
-    </div>
+    @if ($row->id ?? null)
+        @include('UIKitView::components.row-operations' , ['index' => $row->id ?? ($i + 1)])
+    @endif
 
+   
+    @endforeach
 
 
 

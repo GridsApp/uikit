@@ -8,19 +8,40 @@ namespace twa\uikit\FieldTypes;
 class Select extends FieldType
 {
     public function component()
-    {
+    { 
         return "elements.select";
     }
 
 
-    public function db(&$table)
+    public function columnType()
+    {
+       
+        if (isset($this->field['multiple']) &&  $this->field['multiple']) {
+            return \twa\uikit\Classes\ColumnTypes\Tags::class;
+        }
+    
+        return \twa\uikit\Classes\ColumnTypes\Tag::class;
+    }
+
+    public function operationType()
     {
 
+        if (isset($this->field['multiple']) &&  $this->field['multiple']) {
+            return \twa\uikit\Classes\ColumnOperationTypes\ManyToMany::class;
+        }
     
-       if($this->field['options']['type'] ?? null == "static"){
+        return \twa\uikit\Classes\ColumnOperationTypes\BelongsTo::class;
+    }
+
+
+    public function db(&$table)
+    {  
+
+
+        if ($this->field['options']['type'] ?? null == "static") {
             $table->string($this->field['name'])->nullable();
             return;
-       }
+        }
 
         if (isset($this->field['multiple']) && $this->field['multiple']) {
             $table->text($this->field['name'])->nullable();
@@ -38,18 +59,18 @@ class Select extends FieldType
         if (isset($this->field['multiple']) && $this->field['multiple']) {
             $default = [];
 
-            if(!isset($data->{$this->field['name']})){
+            if (!isset($data->{$this->field['name']})) {
                 return $default;
             }
 
 
-            if(!is_array($data->{$this->field['name']})){
+            if (!is_array($data->{$this->field['name']})) {
                 $data->{$this->field['name']} = json_decode($data->{$this->field['name']});
             }
 
             return  $data->{$this->field['name']};
         }
-    
+
         return $data->{$this->field['name']} ?? null;
     }
 
@@ -91,6 +112,8 @@ class Select extends FieldType
 
     public function display($data)
     {
+
+     
         $field = $this->field;
         if (!(isset($data[$field['name']]) && $data[$field['name']])) {
             return null;
@@ -98,11 +121,11 @@ class Select extends FieldType
 
         if (isset($this->field['multiple']) && $this->field['multiple']) {
             $selectedValues = $data[$field['name']] ?? [];
-          
+
             $count = count($selectedValues);
             $html = "<div class='flex gap-1 items-center'>";
             if ($count > 0) {
-                $html .= "<div class='twa-table-td-select'>" . "<span>  $selectedValues[0]</span> ". "</div>";
+                $html .= "<div class='twa-table-td-select'>" . "<span>  $selectedValues[0]</span> " . "</div>";
             }
             if ($count > 1) {
                 $html .= "<div class='twa-table-td-select'>  +" . (count($selectedValues) - 1) . " more</div>";

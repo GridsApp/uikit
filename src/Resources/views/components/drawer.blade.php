@@ -26,7 +26,10 @@
                                     <div class="flex items-center h-auto ml-3">
                                         <button x-on:click.stop="{{$closeHandler}}"
                                             class="absolute top-0 right-0 z-30 flex items-center justify-center px-3 py-2 mt-4 mr-5 space-x-1 text-xs font-medium uppercase  rounded-md  text-neutral-600 hover:bg-neutral-100">
-                                            <i class="fa-regular fa-x"></i>
+                                            {{-- <i class="fa-regular fa-x"></i> --}}
+                                            <div style="width:20px; height:20px">
+                                                @include('UIKitView::components.icons.cross')
+                                            </div>
                                         </button>
                                     </div>
                                 </div>

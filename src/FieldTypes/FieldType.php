@@ -4,7 +4,6 @@ namespace twa\uikit\FieldTypes;
 
 
 
-
 class FieldType
 {
 
@@ -13,6 +12,15 @@ class FieldType
     public function __construct($field)
     {
         $this->field = $field;
+    }
+
+    public function columnType(){
+
+        return \twa\uikit\Classes\ColumnTypes\DefaultType::class;
+    }
+
+    public function operationType(){
+        return \twa\uikit\Classes\ColumnOperationTypes\DefaultOperationType::class;
     }
 
     public function db(&$table){

@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    {{-- @include('UIKitView::components.toast') --}}
+    @include('UIKitView::components.toast')
     @livewireScripts
     @yield('master-content')
 </body>

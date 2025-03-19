@@ -22,9 +22,9 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
                         @endif
                         <span class="selected-class" x-text="selectedOption.label"></span>
                         @if ($info['multiple'])
-                            <button @click="handleClearSelection($event, selectedOption.label)" type="button"
+                            <button class="w-[20px]" @click="handleClearSelection($event, selectedOption.label)" type="button"
                                 role="button">
-                                <i class="fa-regular fa-x text-[10px]"></i>
+                                @include('UIKitView::components.icons.cross')
                             </button>
                             </span>
                         @endif
@@ -42,20 +42,27 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
                     </span>
                 </template>
                 <div class="twa-select-actions ">
-                    <div @click="handleClear(event)" class="h-full w-[14px]  items-center flex justify-center">
-                        <button type="button" role="button" class="twa-select-selections-remove"
+                    <div @click="handleClear(event)" class="h-full w-[18px]  items-center flex justify-center">
+                        <button type="button" role="button" class="twa-select-selections-remove w-[20px] h-[20px]"
                             x-show="Array.isArray(selectedOptions) && selectedOptions.length > 0">
-                            <i class="fa-regular fa-x"></i>
+                            @include('UIKitView::components.icons.cross')
                         </button>
                     </div>
                     <div class="w-[36px] h-full flex justify-center items-center">
-                        <i class="fa-regular fa-angles-up-down"></i>
+                        {{-- <i class="fa-regular fa-angles-up-down"></i> --}}
+                       <div class="w-[15px]">
+                        @include('UIKitView::components.icons.arrow-up-down')
+                                   
+
+                       </div>
                     </div>
                     @if ($quick_add)
                         <div @click="openQuickAdd($event)"
                             class="flex w-[36px] cursor-pointer  rounded-r-md  justify-center h-full border-l border-twafieldsblack-200 hover:bg-twafieldsgray-100 ">
                             <button type="button" role="button" class="twa-select-add">
-                                <i class="fa-regular fa-plus"></i>
+                              <div class="w-[15px]">
+                                @include('UIKitView::components.icons.plus')
+                              </div>
                             </button>
                         </div>
                     @endif
@@ -84,9 +91,9 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
                                         <div class="px-4">
                                             <div class="flex items-start justify-between pb-1">
                                                 <h2 class="text-base font-semibold leading-6 text-twafieldsgray-900" id="slide-over-title">{{$info['label']}}</h2>
-                                                <div class="flex items-center h-auto ml-3">
+                                                <div class="flex items-center h-auto ml-3 w-[20px]">
                                                     <button @click="drawerOpen=false" class="absolute top-0 right-0 z-30 flex items-center justify-center px-3 py-2 mt-4 mr-5 space-x-1 text-xs font-medium uppercase  rounded-md  text-neutral-600 hover:bg-neutral-100">
-                                                        <i class="fa-regular fa-x"></i>
+                                                        @include('UIKitView::components.icons.cross')
                                                     </button>
                                                 </div>
                                             </div>

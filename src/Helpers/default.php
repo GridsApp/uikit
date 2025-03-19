@@ -46,7 +46,7 @@ function get_field_modal($field)
 
             $render = view("UIKitView::components.form.language", ['info' => $field]);
 
-            $container = $field['container'] ?? $container;
+            $container = $container ?? ($field['container'] ?? null);
 
             if ($container) {
                 return "<div class='" . $container . "'>" . $render . "</div>";
@@ -61,7 +61,7 @@ function get_field_modal($field)
 
         $render = Livewire::mount($path, $params, "component_" . uniqid());
 
-        $container = $field['container'] ?? $container;
+        $container = $container ?? ($field['container'] ?? null);
 
         if ($container) {
             return "<div class='" . $container . "'>" . $render . "</div>";

@@ -16,6 +16,11 @@ class Images extends DefaultType
     public function html($parameters = [])
     {
 
+        if(json_validate($this->input)){
+            $this->input = json_decode($this->input , 1);
+        }
+
+
         if (!is_array($this->input)) {
             $this->input = [$this->input];
         }
@@ -28,7 +33,9 @@ class Images extends DefaultType
 
 
         if (count($this->input) > 0) {
-            $html .= "<div class='twa-table-td-image'><img class='td-image' src='" . $this->input[0] . "' /></div>";
+        // return "<div class='twa-table-td-image'><img class='td-image' src='".get_image($this->input)."'></div>";
+
+            $html .= "<div class='twa-table-td-image'><img class='td-image' src='" .get_image($this->input[0])."' /></div>";
         }
 
         if (count($this->input) > 1) {

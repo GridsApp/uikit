@@ -101,8 +101,15 @@ select {
                     @apply font-bold relative;
 
                     &:after {
-                        content: "\f00c";
+                        content: "";
+                        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 12L9.89075 14.8907C9.95114 14.951 10.049 14.9511 10.1094 14.8907L17 8' stroke='%23323232' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+                        background-size: contain;
+                        background-repeat: no-repeat;
                         // font-family: $font-awesome;
+
+                        width: 20px;
+                        height: 20px;
+
                         position: absolute;
                         right: 20px;
                         top: 50%;

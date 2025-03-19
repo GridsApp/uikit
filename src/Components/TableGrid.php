@@ -2,13 +2,14 @@
 
 namespace twa\uikit\Components;
 
-use App\Traits\ToastTrait;
+
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Illuminate\Database\Query\Expression;
+use twa\uikit\Traits\ToastTrait;
 
 class TableGrid extends Component
 {
@@ -39,6 +40,7 @@ class TableGrid extends Component
     ];
 
     public function mount(){
+        
         
        $this->filters =  $this->table["filters"];
        $this->columns =  $this->table["columns"];
@@ -470,22 +472,78 @@ class TableGrid extends Component
 
         return view('UIKitView::components.table-grid', ['rows' => $rows]);
     }
+    // public function handleDelete($selected)
+    // {
+
+
+    //     if ($this->entity['gridRules'] ?? null) {
+
+    //         $deleteRule = collect($this->entity['gridRules'])->where('operation', 'delete')->first();
+
+    //         if ($deleteRule) {
+
+    //             $ids =   DB::table($this->entity['table'])
+    //                 ->where($deleteRule['condition']['field'], $deleteRule['condition']['operand'], $deleteRule['condition']['value'])
+    //                 ->pluck('id');
+
+    //             $intersectionFound = collect($selected)->intersect($ids)->count() > 0;
+
+    //             if ($intersectionFound) {
+    //                 $this->render();
+    //                 $this->sendError("Not Deleted", "You don't have permission to delete this record");
+    //                 return response()->json(["result" => true], 200);
+    //             }
+    //         }
+    //     }
+
+
+    //     // dd($selected);
+
+    //     try {
+
+    //         DB::beginTransaction();
+
+    //         if (!is_array($selected)) {
+    //             $selected = json_decode($selected, 1);
+    //         }
+
+    //         if (!is_array($selected)) {
+    //             return;
+    //         }
+
+    //         DB::table($this->entity['table'])->whereIn('id', $selected)->update([
+    //             'deleted_at' =>  now()
+    //         ]);
+
+
+    //         DB::commit();
+
+    //         $this->render();
+
+    //         $this->sendSuccess("Deleted", "Record sucessfully deleted");
+
+    //         return response()->json(["result" => true], 200);
+    //     } catch (\Throwable $th) {
+
+    //         DB::rollBack();
+
+    //         $this->render();
+
+    //         $this->sendError("Not Deleted", "Record was not deleted");
+
+    //         return response()->json(["result" => false], 200);
+    //     }
+    // }
 
 
 
     public function handleDelete($selected)
     {
-        if (!is_array($selected)) {
-            $selected = json_decode($selected, true);
-        }
-    
+
         if (!is_array($selected) || empty($selected)) {
             $this->sendError("Error", "Invalid selection.");
            
-        }
-
-        dd($selected);
-    
+        }    
         try {
             DB::table($this->table['name'])->whereIn('id', $selected)->update([
                 'deleted_at' =>  now()
@@ -496,7 +554,7 @@ class TableGrid extends Component
             $this->render(); 
     
         } catch (\Throwable $e) {
-            dd($e);
+           
             $this->sendError("Error", "Could not delete records.");
         }
     }

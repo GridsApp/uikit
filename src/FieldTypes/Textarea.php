@@ -12,6 +12,7 @@ class Textarea extends FieldType
         return "elements.textarea";
     }
 
+    
 
     public function db(&$table){
         $table->text($this->field['name'])->nullable();
