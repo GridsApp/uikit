@@ -13,6 +13,12 @@ class Number extends FieldType
         return "elements.number";
     }
 
+
+    public function filterType(){
+
+        return \twa\uikit\Classes\FilterTypes\Number::class;
+    }
+
     public function db(&$table){
         $table->double($this->field['name'])->nullable();
     }

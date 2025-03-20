@@ -63,8 +63,8 @@ class TableGrid extends Component
                     'wire:model' => 'filter.{name}.option',
                 ],
                 'type' => \twa\uikit\FieldTypes\Select::class,
-                'label' =>  $filter['label'],
-                'placeholder' => 'Select option',
+                'label' =>  "",
+                'placeholder' => "Choose option",
                 'name' => $filter['name'],
                 'multiple' => false,
                 'visible_selections' => 3,
@@ -86,8 +86,8 @@ class TableGrid extends Component
                     'wire:model' => 'filter.{name}.value1',
                 ],
                 'type' => $class->field_type,
-                'label' => $filter['label'],
-                'placeholder' => 'Select option',
+                'label' => "",
+                'placeholder' => $filter['label'],
                 'name' => $filter['name'],
                 'multiple' => false,
                 'visible_selections' => 3,
@@ -102,7 +102,7 @@ class TableGrid extends Component
                 ],
                 'type' => $class->field_type,
                 'label' => '',
-                'placeholder' => 'Select option',
+                'placeholder' => $filter['label'],
                 'name' => $filter['name'],
                 'multiple' => false,
                 'visible_selections' => 3,
@@ -111,6 +111,7 @@ class TableGrid extends Component
             ];
 
             if (is_a($class->field_type, \twa\uikit\FieldTypes\Select::class, true)) {
+
                 $field1['options'] = [
                     'type' => 'query',
                     'table' => $filter['table'],
@@ -161,6 +162,8 @@ class TableGrid extends Component
         }
 
 
+        // dd($updated_filters);
+
         $this->filters = $updated_filters;
         $this->enabledFilterCount = collect($this->filter)
             ->filter(fn($filter) => $filter['enabled'])
@@ -181,8 +184,6 @@ class TableGrid extends Component
                 continue;
             }
 
-
-       
             $current_filter = collect($this->filters)->where('name', $column)->first();
 
             if (!$current_filter) {
@@ -198,10 +199,12 @@ class TableGrid extends Component
 
             $filter['value1'] = (string) $filter['value1'];
      
+            
             // dd($current_filter['type']);
+
             try {
                 (new ($current_filter['type']))->handle($rows, $joins, $this->columns, $this->table, $current_filter, $filter);
-                dd("hereeee"); 
+
             } catch (\Throwable $e) {
                 dd($e->getMessage(), $e->getTraceAsString());
             }

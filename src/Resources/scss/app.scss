@@ -188,13 +188,14 @@ $border-width: 10px;
 
 
 
-.placeholder-class,
-input[type="date"],
-input[type="text"],
-textarea,
-input[type="number"] {
-    @apply text-[12px];
-}
+
+// .placeholder-class,
+// input[type="date"],
+// input[type="text"],
+// textarea,
+// input[type="number"] {
+//     @apply text-[12px] text-red-600 #{!important};
+// }
 
 
 
@@ -211,4 +212,7 @@ input[type="number"] {
     }
     .text {
     }
+}
+input::placeholder {
+    @apply  normal-case	 font-normal text-[10px] tracking-normal text-[#4b5563]  #{!important};
 }

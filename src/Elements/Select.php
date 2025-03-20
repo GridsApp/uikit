@@ -72,6 +72,11 @@ class Select extends Component
                 });
 
 
+                foreach($this->info['options']['conditions'] ?? [] as $condition){
+                    apply_condition($options , $condition);
+                }
+               
+
 
                 $options = $options->orderBy('label' , 'ASC');
 

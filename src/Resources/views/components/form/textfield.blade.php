@@ -18,7 +18,11 @@
                     x-on:input="handleInput" @endif
             @else @if (isset($info['channel_type']) && $info['channel_type'] == 'sender') x-on:input="handleInput" @endif @endif
 
-            tabindex="{{ $info['index'] }}" wire:model="value" type="text"  @if($info['autofocus'] ?? null)  x-init="$el.focus()" @endif
+            tabindex="{{ $info['index'] }}" 
+            
+            placeholder="{{$info['placeholder']}}"
+
+            wire:model="value" type="text"  @if($info['autofocus'] ?? null)  x-init="$el.focus()" @endif
             class="twa-form-input  "
             
             

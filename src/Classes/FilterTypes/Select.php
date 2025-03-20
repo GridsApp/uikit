@@ -13,6 +13,9 @@ class Select extends FilterType
 
        
 
+        
+        dd("here");
+
         $column = "$table.".$filter['foreign_key'];
         $value1 = $filter_value['value1'];
 

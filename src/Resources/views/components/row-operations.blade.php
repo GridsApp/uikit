@@ -15,7 +15,9 @@
             </a>
         </div>
     @endforeach
-    <div x-cloak x-show="actions.allowDelete" class="dropdown-menu-item" x-data="{ showModal: false, handleOpen() { this.showModal = true } }"
+    <div x-cloak x-show="actions.allowDelete" class="dropdown-menu-item"
+    
+     x-data="{ showModal: false, handleOpen() { this.showModal = true } }"
         @click.away="showModal = false" @click="handleOpen">
         <div class="dropdown-menu-link">
             <span class="dropdown-menu-icon"> <i class="fa-solid fa-trash-can"></i></span>

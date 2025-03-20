@@ -36,6 +36,11 @@ class Toggle extends FieldType
 
     }
 
+    public function filterType(){
+
+        return \twa\uikit\Classes\FilterTypes\Toggle::class;
+    }
+
 
     public function display($data){
         if(!(isset($data[$this->field['name']]) && $data[$this->field['name']])){

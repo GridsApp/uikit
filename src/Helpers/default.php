@@ -8,13 +8,69 @@ function get_field_modal($field)
 }
 
 
+
+function update_conditions($conditions){
+    $field_permissions = session('field_permissions' , []);
+
+    // dd($conditions ,$field_permissions);
+
+    if(empty($field_permissions)){
+        return [];
+    }
+
+    if (!is_array($field_permissions)) {
+        $field_permissions = []; 
+    }
+
+    $array_keys = array_keys($field_permissions);
+
+
+    $array_keys =  array_map(function($item) {
+        return "{" . $item . "}";
+    }, $array_keys);
+    
+
+    $array_values = array_values($field_permissions);
+   
+   
+
+
+    $updated_conditions = []; 
+    // if (empty($updated_conditions)) {
+    //     unset($conditions); 
+    // }
+    foreach ($conditions ?? [] as $condition) {
+        if ($condition['value'] !== null) {
+            $condition['value'] = str_replace($array_keys, $array_values, $condition['value']);
+            $updated_conditions[] = $condition; 
+        }
+    }
+
+    return $updated_conditions;
+}
+
+
+
     function field($field, $container = null){
 
         if (is_string($field)) {
             $field = config('fields.' . $field);
         }
 
+    
+        $updated_conditions = update_conditions($field['options']['conditions'] ?? []);
+   
+       
+        
+        if (count($updated_conditions) > 0) {
+            $field['options']['conditions'] = $updated_conditions;
+        }else{
+            $field['options']['conditions'] = [];
+        }
+      
+        
 
+        // dd($field_permissions);
 
 
         if (!$field) {

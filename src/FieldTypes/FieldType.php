@@ -19,6 +19,12 @@ class FieldType
         return \twa\uikit\Classes\ColumnTypes\DefaultType::class;
     }
 
+
+    public function filterType(){
+
+        return \twa\uikit\Classes\FilterTypes\Textfield::class;
+    }
+
     public function operationType(){
         return \twa\uikit\Classes\ColumnOperationTypes\DefaultOperationType::class;
     }

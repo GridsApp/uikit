@@ -41,7 +41,7 @@ class TableData
     }
 
 
-    public function addFilter($label, $name, $column, $type)
+    public function addFilter($label, $name, $column, $type , $attributes = [])
     {
 
         $column =  str($column)->contains(".") ? $column : $this->table . '.' . $column;
@@ -51,6 +51,7 @@ class TableData
             'column' => $column,
             'label' => $label,
             'type' => $type,
+            ...$attributes
         ];
 
         return $this;
@@ -69,6 +70,7 @@ class TableData
 
     public function addColumn($label, $name, $type = "\twa\uikit\Classes\ColumnTypes\DefaultType::class",   $operator = null, $parameters = [], $attributes = [], $callback = null)
     {
+        
 
 
         $this->columns[] = [

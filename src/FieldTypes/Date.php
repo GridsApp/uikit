@@ -15,6 +15,12 @@ class Date extends FieldType
     }
 
 
+    public function filterType(){
+
+        return \twa\uikit\Classes\FilterTypes\Date::class;
+    }
+
+
 
     public function db(&$table){
         $table->date($this->field['name'])->nullable();
