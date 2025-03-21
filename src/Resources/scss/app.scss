@@ -1,4 +1,3 @@
-
 @forward "./form/_select.scss";
 @forward "./form/_password.scss";
 @forward "./form/_language.scss";
@@ -10,9 +9,6 @@
 @forward "./table.scss";
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
-
-
-
 
 $font-family: "Inter", sans-serif;
 
@@ -44,7 +40,6 @@ $font-family: "Inter", sans-serif;
 //     // line-height: 1.5rem;
 //     // --tw-shadow: 0 0 #0000;
 // }
-
 
 // [type="text"]:focus {
 //     outline: none !important;
@@ -164,9 +159,6 @@ select {
 $circular-size: 200px;
 $border-width: 10px;
 
-
-
-
 .checkbox {
     position: relative;
     overflow: hidden;
@@ -184,24 +176,24 @@ $border-width: 10px;
     border-color: rgba(0, 0, 0, 0.2);
 }
 
-
-
-
-
-
-// .placeholder-class,
-// input[type="date"],
-// input[type="text"],
-// textarea,
-// input[type="number"] {
-//     @apply text-[12px] text-red-600 #{!important};
-// }
-
-
-
+.placeholder-class,
+input[type="date"],
+input[type="text"],
+textarea,
+input[type="number"] {
+    @apply text-[12px]  #{!important};
+}
 .has-prefix {
-    input {
-        padding-left: 0 !important;
+input{
+    padding-left: 0 !important;
+}
+}
+.has-prefix {
+    [type=number]:focus {
+       
+           
+            outline: 0.5px solid transparent !important;
+  
     }
 }
 
@@ -214,5 +206,9 @@ $border-width: 10px;
     }
 }
 input::placeholder {
-    @apply  normal-case	 font-normal text-[10px] tracking-normal text-[#4b5563]  #{!important};
+    @apply normal-case	 font-normal text-[10px] tracking-normal text-[#4b5563]  #{!important};
+}
+
+.selected-class{
+    @apply text-[12px];
 }
