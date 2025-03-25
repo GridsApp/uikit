@@ -4,10 +4,7 @@
 
 @endphp
 
-<div class="twa-select" 
-x-on:record-created-{{ $unique_id }}.window='handleCreateCallback' 
-
-x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['dispatch']['init'] ?? ''}}' , '{{$info['dispatch']['change'] ?? ''}}')">
+<div class="twa-select" x-on:record-created-{{ $unique_id }}.window='handleCreateCallback' x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }}, '{{ $info['dispatch']['init'] ?? '' }}', '{{ $info['dispatch']['change'] ?? '' }}')">
     <label class="twa-form-label">
         {{ $info['label'] }}
     </label>
@@ -22,8 +19,8 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
                         @endif
                         <span class="selected-class" x-text="selectedOption.label"></span>
                         @if ($info['multiple'])
-                            <button class="w-[20px]" @click="handleClearSelection($event, selectedOption.label)" type="button"
-                                role="button">
+                            <button class="w-[20px]" @click="handleClearSelection($event, selectedOption.label)"
+                                type="button" role="button">
                                 @include('UIKitView::components.icons.cross')
                             </button>
                             </span>
@@ -50,49 +47,46 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
                     </div>
                     <div class="w-[36px] h-full flex justify-center items-center">
                         {{-- <i class="fa-regular fa-angles-up-down"></i> --}}
-                       <div class="w-[15px]">
-                        @include('UIKitView::components.icons.arrow-up-down')
-                                   
+                        <div class="w-[15px]">
+                            @include('UIKitView::components.icons.arrow-up-down')
 
-                       </div>
+
+                        </div>
                     </div>
                     @if ($quick_add)
                         <div @click="openQuickAdd($event)"
                             class="flex w-[36px] cursor-pointer  rounded-r-md  justify-center h-full border-l border-twafieldsblack-200 hover:bg-twafieldsgray-100 ">
                             <button type="button" role="button" class="twa-select-add">
-                              <div class="w-[15px]">
-                                @include('UIKitView::components.icons.plus')
-                              </div>
+                                <div class="w-[15px]">
+                                    @include('UIKitView::components.icons.plus')
+                                </div>
                             </button>
                         </div>
                     @endif
                 </div>
             </div>
             <template x-teleport="body">
-                <div
-                    x-show="drawerOpen"
-                    @keydown.window.escape="drawerOpen=false"
-                    class="relative z-[99]">
-                    <div x-show="drawerOpen" x-transition.opacity.duration.600ms @click="drawerOpen = false" class="fixed inset-0 bg-twafieldsblack bg-opacity-10"></div>
+                <div x-show="drawerOpen" @keydown.window.escape="drawerOpen=false" class="relative z-[99]">
+                    <div x-show="drawerOpen" x-transition.opacity.duration.600ms @click="drawerOpen = false"
+                        class="fixed inset-0 bg-twafieldsblack bg-opacity-10"></div>
                     <div class="fixed inset-0 overflow-hidden">
                         <div class="absolute inset-0 overflow-hidden">
                             <div class="fixed inset-y-0 right-0 flex max-w-full pl-10">
-                                <div
-                                    x-show="drawerOpen"
-                                    @click.away="drawerOpen = false"
+                                <div x-show="drawerOpen" @click.away="drawerOpen = false"
                                     x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
-                                    x-transition:enter-start="translate-x-full"
-                                    x-transition:enter-end="translate-x-0"
+                                    x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
                                     x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
-                                    x-transition:leave-start="translate-x-0"
-                                    x-transition:leave-end="translate-x-full"
+                                    x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
                                     class="w-screen max-w-md">
-                                    <div class="flex flex-col h-full py-5 overflow-y-scroll bg-white border-l shadow-lg border-neutral-100/70">
+                                    <div
+                                        class="flex flex-col h-full py-5 overflow-y-scroll bg-white border-l shadow-lg border-neutral-100/70">
                                         <div class="px-4">
                                             <div class="flex items-start justify-between pb-1">
-                                                <h2 class="text-base font-semibold leading-6 text-twafieldsgray-900" id="slide-over-title">{{$info['label']}}</h2>
+                                                <h2 class="text-base font-semibold leading-6 text-twafieldsgray-900"
+                                                    id="slide-over-title">{{ $info['label'] }}</h2>
                                                 <div class="flex items-center h-auto ml-3 w-[20px]">
-                                                    <button @click="drawerOpen=false" class="absolute top-0 right-0 z-30 flex items-center justify-center px-3 py-2 mt-4 mr-5 space-x-1 text-xs font-medium uppercase  rounded-md  text-neutral-600 hover:bg-neutral-100">
+                                                    <button @click="drawerOpen=false"
+                                                        class="absolute top-0 right-0 z-30 flex items-center justify-center px-3 py-2 mt-4 mr-5 space-x-1 text-xs font-medium uppercase  rounded-md  text-neutral-600 hover:bg-neutral-100">
                                                         @include('UIKitView::components.icons.cross')
                                                     </button>
                                                 </div>
@@ -100,7 +94,7 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
                                         </div>
                                         <div class="px-4 pt-4">
                                             @if (!empty($quick_add))
-                                                    @livewire('entity-forms.form' , [ 'wire:key' => uniqid() ,'unique_id'=> $unique_id , 'slug' => $quick_add  ])
+                                                @livewire('entity-forms.form', ['wire:key' => uniqid(), 'unique_id' => $unique_id, 'slug' => $quick_add])
                                             @endif
                                         </div>
                                     </div>
@@ -135,13 +129,9 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
                             <template x-if="option.label">
                                 <div class="twa-select-options-list-item">
                                     <input :id="option.identifier" type="{{ $info['multiple'] ? 'checkbox' : 'radio' }}"
-                                        :value="option.value" name="{{ $info['name'] }}"
-                                        x-model= "selectedValues"
-                                           
-                                        @foreach($info['events'] ?? [] as $key => $infoEvent)
-                                               {{$key}}="{{$infoEvent}}"
-                                        @endforeach
-                                    >
+                                        :value="option.value" name="{{ $info['name'] }}" x-model= "selectedValues"
+                                        @foreach ($info['events'] ?? [] as $key => $infoEvent)
+                                               {{ $key }}="{{ $infoEvent }}" @endforeach>
                                     <label class="twa-select-options-label" :for="option.identifier"
                                         x-text="option.label"></label>
                                 </div>
@@ -160,9 +150,12 @@ x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }} , '{{$info['
             </div>
         </div>
     </div>
+    @if ($info['hint'] ?? null)
+        <span class="dark:text-dark-400 mt-1 block text-[12px] text-gray-500">{{ $info['hint'] }}</span>
+    @endif
     @error(get_field_modal($info) ?? 'value')
-    <span class="form-error-message {{get_field_modal($info)}}">
-        {{$message}}
+        <span class="form-error-message {{ get_field_modal($info) }}">
+            {{ $message }}
         </span>
     @enderror
 

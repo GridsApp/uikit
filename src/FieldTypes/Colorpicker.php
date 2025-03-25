@@ -11,6 +11,15 @@ class Colorpicker extends FieldType
         return "elements.colorpicker";
     }
 
+
+    public function columnType()
+    {
+       
+       
+        return "hovig";
+    }
+
+
     public function initalValue($data)
     {
         $default = '#000000';

@@ -15,7 +15,6 @@ class FieldType
     }
 
     public function columnType(){
-
         return \twa\uikit\Classes\ColumnTypes\DefaultType::class;
     }
 
