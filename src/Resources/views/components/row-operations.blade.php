@@ -9,7 +9,22 @@
         <div x-cloak 
         {{-- x-show="actions.allowEdit"  --}}
         class="dropdown-menu-item">
-            <a :href="'{{ $row_operation['link'] }}'.replace('{id}', actionsActive)" class="dropdown-menu-link">
+
+            @php
+
+                $link = Str($row_operation['link']);
+
+              
+               foreach($row_operation['columns'] ?? [] as $row_column){
+                // dd($family_group_id); 
+               $link = $link->replace("{".$row_column."}", $row->{$row_column});
+               }
+               $link = $link->toString();
+
+              
+            @endphp
+
+            <a href="{{$link}}" class="dropdown-menu-link">
                 <span class="dropdown-menu-icon">{!! $row_operation['icon'] !!}</span>
                 <span class="dropdown-menu-title">{{ $row_operation['label'] }}</span>
             </a>

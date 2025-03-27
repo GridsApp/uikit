@@ -270,7 +270,7 @@
         @apply relative h-[34px];
     }
     .filter-dropdown-button-counter {
-        @apply bg-primary-500 text-white text-[8px] items-center justify-center rounded-full flex h-[16px] w-[16px];
+        @apply bg-twafieldsprimary-500 text-white text-[8px] items-center justify-center rounded-full flex h-[16px] w-[16px];
     }
     .filter-dropdown-button {
         @apply flex items-center gap-2 bg-gray-50 px-7 py-2 rounded-md text-gray-600;
@@ -311,7 +311,7 @@
         }
 
         input[type="checkbox"] {
-            @apply accent-primary-500;
+            @apply accent-twafieldsprimary-500;
             // accent-color: black;
         }
 
@@ -382,7 +382,7 @@
         @apply relative h-full;
     }
     .options-dropdown-button-counter {
-        @apply bg-primary-500 text-white text-[8px] items-center justify-center rounded-full flex h-[16px] w-[16px];
+        @apply bg-twafieldsprimary-500 text-white text-[8px] items-center justify-center rounded-full flex h-[16px] w-[16px];
     }
     .options-dropdown-button {
         @apply flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-md text-gray-600 h-full;
@@ -426,7 +426,7 @@
         }
 
         input[type="checkbox"] {
-            @apply accent-primary-500;
+            @apply accent-twafieldsprimary-500;
             // accent-color: black;
         }
 
@@ -571,7 +571,7 @@ overflow: hidden;
 
 
 .twa-table-td-select {
-    @apply gap-1 dark:text-dark-100 dark:bg-dark-700 dark:ring-dark-600 inline-flex py-1 items-center space-x-1 rounded-lg bg-gray-100 px-2 text-[12px] font-medium text-gray-600 ring-1 ring-inset ring-gray-200;
+    @apply gap-1 dark:text-twafieldsdark-100  inline-flex py-1 items-center space-x-1 rounded-lg bg-gray-100 px-2 text-[12px] font-medium text-gray-600 ring-1 ring-inset ring-gray-200;
 
     span {
         width: max-content;

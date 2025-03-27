@@ -30,14 +30,14 @@
 
 .btn{
 
-    @apply text-[12px] focus:ring-offset-white inline-flex items-center justify-center gap-x-2 border outline-none transition-all duration-200 ease-in-out hover:shadow-sm focus:border-transparent focus:ring-2 disabled:cursor-not-allowed disabled:opacity-80 px-4 py-2 border-transparent focus:ring-offset-2 dark:focus:ring-offset-dark-900 rounded-md;
+    @apply text-[12px] focus:ring-offset-white inline-flex items-center justify-center gap-x-2 border outline-none transition-all duration-200 ease-in-out hover:shadow-sm focus:border-transparent focus:ring-2 disabled:cursor-not-allowed disabled:opacity-80 px-4 py-2 border-transparent focus:ring-offset-2 rounded-md;
 
     &.btn-primary{
-        @apply text-primary-50 ring-primary-500 bg-primary-500 focus:bg-primary-600 hover:bg-primary-600 dark:focus:ring-primary-600 dark:bg-primary-700 dark:hover:bg-primary-600 dark:hover:ring-primary-600;
+        @apply text-primary-50 ring-twafieldsprimary-500 bg-twafieldsprimary-500 focus:bg-twafieldsprimary-600 hover:bg-twafieldsprimary-600  ;
     }
 
     &.btn-secondary{
-        @apply text-secondary-50 ring-secondary-500 bg-secondary-500 focus:bg-secondary-600 hover:bg-secondary-600 dark:focus:ring-secondary-600 dark:bg-secondary-700 dark:hover:bg-secondary-600 dark:hover:ring-secondary-600;
+        @apply text-twafieldssecondary-50 ring-twafieldssecondary-500 bg-twafieldssecondary-500 focus:bg-twafieldssecondary-600 hover:bg-twafieldssecondary-600 dark:focus:ring-twafieldssecondary-600 dark:bg-twafieldssecondary-700 dark:hover:bg-twafieldssecondary-600 dark:hover:ring-twafieldssecondary-600;
     }
 
 }

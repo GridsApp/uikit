@@ -1,4 +1,6 @@
 <?php
+
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 
 
@@ -9,40 +11,41 @@ function get_field_modal($field)
 
 
 
-function update_conditions($conditions){
-    $field_permissions = session('field_permissions' , []);
+function update_conditions($conditions)
+{
+    $field_permissions = session('field_permissions', []);
 
     // dd($conditions ,$field_permissions);
 
-    if(empty($field_permissions)){
+    if (empty($field_permissions)) {
         return [];
     }
 
     if (!is_array($field_permissions)) {
-        $field_permissions = []; 
+        $field_permissions = [];
     }
 
     $array_keys = array_keys($field_permissions);
 
 
-    $array_keys =  array_map(function($item) {
+    $array_keys =  array_map(function ($item) {
         return "{" . $item . "}";
     }, $array_keys);
-    
+
 
     $array_values = array_values($field_permissions);
-   
-   
 
 
-    $updated_conditions = []; 
+
+
+    $updated_conditions = [];
     // if (empty($updated_conditions)) {
     //     unset($conditions); 
     // }
     foreach ($conditions ?? [] as $condition) {
         if ($condition['value'] !== null) {
             $condition['value'] = str_replace($array_keys, $array_values, $condition['value']);
-            $updated_conditions[] = $condition; 
+            $updated_conditions[] = $condition;
         }
     }
 
@@ -51,128 +54,170 @@ function update_conditions($conditions){
 
 
 
-    function field($field, $container = null){
+function field($field, $container = null)
+{
 
-        if (is_string($field)) {
-            $field = config('fields.' . $field);
-        }
-
-    
-        $updated_conditions = update_conditions($field['options']['conditions'] ?? []);
-   
-       
-        
-        if (count($updated_conditions) > 0) {
-            $field['options']['conditions'] = $updated_conditions;
-        }else{
-            $field['options']['conditions'] = [];
-        }
-      
-        
-
-        // dd($field_permissions);
+    if (is_string($field)) {
+        $field = config('fields.' . $field);
+    }
 
 
-        if (!$field) {
-            return null;
-        }
+    $updated_conditions = update_conditions($field['options']['conditions'] ?? []);
 
 
-        if (!(isset($field['livewire']) && $field['livewire'])) {
-            $field['livewire'] = [
-                "wire:model" => $field['name']
-            ];
-        } else {
-            $field['livewire'] = collect($field['livewire'])->map(function ($value) use ($field) {
-                return str_replace('{name}', $field['name'], $value);
-            })->toArray();
-        }
 
-        if (!isset($field['index'])) {
-            $field['index'] = 999;
-        }
+    if (count($updated_conditions) > 0) {
+        $field['options']['conditions'] = $updated_conditions;
+    } else {
+        $field['options']['conditions'] = [];
+    }
 
 
-        $params = [
-            "info" => $field,
-            ...$field['livewire']
+
+    // dd($field_permissions);
+
+
+    if (!$field) {
+        return null;
+    }
+
+
+    if (!(isset($field['livewire']) && $field['livewire'])) {
+        $field['livewire'] = [
+            "wire:model" => $field['name']
         ];
+    } else {
+        $field['livewire'] = collect($field['livewire'])->map(function ($value) use ($field) {
+            return str_replace('{name}', $field['name'], $value);
+        })->toArray();
+    }
 
-        if (isset($field['translatable']) && $field['translatable']) {
-
-            $render = view("UIKitView::components.form.language", ['info' => $field]);
-
-            $container = $container ?? ($field['container'] ?? null);
-
-            if ($container) {
-                return "<div class='" . $container . "'>" . $render . "</div>";
-            } else {
-                return $render;
-            }
-        }
+    if (!isset($field['index'])) {
+        $field['index'] = 999;
+    }
 
 
+    $params = [
+        "info" => $field,
+        ...$field['livewire']
+    ];
 
-        $path = (new $field['type']($field))->component();
+    if (isset($field['translatable']) && $field['translatable']) {
 
-        $render = Livewire::mount($path, $params, "component_" . uniqid());
+        $render = view("UIKitView::components.form.language", ['info' => $field]);
 
         $container = $container ?? ($field['container'] ?? null);
 
         if ($container) {
             return "<div class='" . $container . "'>" . $render . "</div>";
+        } else {
+            return $render;
         }
-
-        return $render;
     }
 
 
-    function apply_condition(&$rows , $condition){
-         
-        $condition['operand'] = $condition['operand'] ?? '=';
 
-        switch ($condition['type']) {
-            case 'having':
-                $rows->having($condition['column'], $condition['operand'], $condition['value']);
-                break;
+    $path = (new $field['type']($field))->component();
 
-            case 'whereIn':
-                $rows->whereIn($condition['column'], $condition['value']);
-                break;
+    $render = Livewire::mount($path, $params, "component_" . uniqid());
 
-            case 'whereNotIn':
-                $rows->whereNotIn($condition['column'], $condition['value']);
-                break;
+    $container = $container ?? ($field['container'] ?? null);
 
-            case 'whereNotNull':
+    if ($container) {
+        return "<div class='" . $container . "'>" . $render . "</div>";
+    }
 
-                $rows->whereNotNull($condition['column']);
-                break;
-            case 'like':
-
-                $rows->where($condition['column'], 'LIKE', '%' . $condition['value'] . '%');
-                break;
-
-            case 'whereNull':
-               
-                $rows->whereNull($condition['column']);
-                break;
-
-            default:
+    return $render;
+}
 
 
-         
+function apply_condition(&$rows, $condition)
+{
 
-                $rows->where($condition['column'], $condition['operand'], $condition['value']);
+    $condition['operand'] = $condition['operand'] ?? '=';
+
+    switch ($condition['type']) {
+        case 'having':
+            $rows->having($condition['column'], $condition['operand'], $condition['value']);
+            break;
+
+        case 'whereIn':
+            $rows->whereIn($condition['column'], $condition['value']);
+            break;
+
+        case 'whereNotIn':
+            $rows->whereNotIn($condition['column'], $condition['value']);
+            break;
+
+        case 'whereNotNull':
+
+            $rows->whereNotNull($condition['column']);
+            break;
+        case 'like':
+
+            $rows->where($condition['column'], 'LIKE', '%' . $condition['value'] . '%');
+            break;
+
+        case 'whereNull':
+
+            $rows->whereNull($condition['column']);
+            break;
+
+        default:
+
+
+
+
+            $rows->where($condition['column'], $condition['operand'], $condition['value']);
+
+            break;
+    }
+}
+
+
+function get_assets()
+{
+    return collect(json_decode(file_get_contents(__DIR__ . '/../../dist/.vite/manifest.json'), true))->map(function ($item) {
+        return "vendor/twa/uikit/dist/" . $item['file'];
+    })->values()->toArray();
+}
+
+if (!function_exists('get_menu')) {
+    function get_menu()
+    {
+        $menu = collect(config('menu'));
+
+        if (!$menu) {
+            return null;
+        }
+        $menu = $menu->map(function ($item) {
+            return process_menu_item($item);
+        });
+
+        return $menu;
+    }
+}
+
+if (!function_exists('process_menu_item')) {
+    function process_menu_item($item)
+    {
+       
+        if (isset($item['link'])) {
+    
+
+      
+            $item['link'] = get_route_object_link($item['link']);
+
+           
             
-                break;
         }
 
-    }
+       
+        if (isset($item['children']) && is_array($item['children'])) {
+           
+            $item['children'] = array_map('process_menu_item', $item['children']);
+        }
 
-
-    function get_assets(){
-        return collect(json_decode(file_get_contents(__DIR__.'/../../dist/.vite/manifest.json'), true))->map(function($item){
-            return "vendor/twa/uikit/dist/".$item['file'];
-        })->values()->toArray();
+        return $item;
     }
+}

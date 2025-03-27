@@ -49,7 +49,7 @@
                         <template x-if="selected.length == 0">
                             <div>
                                 <a href="{{ $table_operation['link'] }}"
-                                    class="text-[12px] h-[34px] focus:ring-offset-white focus:shadow-outline group inline-flex items-center justify-center gap-x-2 border outline-none transition-all duration-200 ease-in-out hover:shadow-sm focus:border-transparent focus:ring-2 disabled:cursor-not-allowed disabled:opacity-80 px-4 py-2 text-primary-50 ring-primary-500 bg-primary-500 focus:bg-primary-600 hover:bg-primary-600 border-transparent focus:ring-offset-2 dark:focus:ring-offset-dark-900 dark:focus:ring-primary-600 dark:bg-primary-700 dark:hover:bg-primary-600 dark:hover:ring-primary-600 rounded-md ">
+                                    class="text-[12px] h-[34px] focus:ring-offset-white focus:shadow-outline group inline-flex items-center justify-center gap-x-2 border outline-none transition-all duration-200 ease-in-out hover:shadow-sm focus:border-transparent focus:ring-2 disabled:cursor-not-allowed disabled:opacity-80 px-4 py-2 text-twafieldsprimary-50 ring-twafieldsprimary-500 bg-twafieldsprimary-500 focus:bg-twafieldsprimary-600 hover:bg-twafieldsprimary-600 border-transparent focus:ring-offset-2 dark:focus:ring-offset-dark-900 dark:focus:ring-twafieldsprimary-600 dark:bg-twafieldsprimary-700 dark:hover:bg-twafieldsprimary-600 dark:hover:ring-twafieldsprimary-600 rounded-md ">
                                     @if (isset($table_operation['icon']))
                                         <span>{!! $table_operation['icon'] ?? '' !!}</span>
                                     @endif {{ $table_operation['label'] ?? '' }}
@@ -244,7 +244,7 @@
 
 
     @if ($row->id ?? null)
-        @include('UIKitView::components.row-operations' , ['index' => $row->id ?? ($i + 1)])
+        @include('UIKitView::components.row-operations' , ['index' => $row->id ?? ($i + 1) , 'row' => $row])
     @endif
 
    

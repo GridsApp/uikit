@@ -39,15 +39,16 @@ class TableGrid extends Component
         'sorting_direction' => ['except' => '']
     ];
 
-    public function mount(){
-        
-        
-       $this->filters =  $this->table["filters"];
-       $this->columns =  $this->table["columns"];
-       $this->table_operations = $this->table['table_operations'];
-      
-  
-       $updated_filters = [];
+    public function mount()
+    {
+
+
+        $this->filters =  $this->table["filters"];
+        $this->columns =  $this->table["columns"];
+        $this->table_operations = $this->table['table_operations'];
+
+
+        $updated_filters = [];
 
         foreach ($this->filters as $filter) {
 
@@ -160,20 +161,10 @@ class TableGrid extends Component
                 'field2' => $field2,
             ];
         }
-
-
-        // dd($updated_filters);
-
         $this->filters = $updated_filters;
         $this->enabledFilterCount = collect($this->filter)
             ->filter(fn($filter) => $filter['enabled'])
             ->count();
-
-
-
-   
-    
-
     }
 
     public function setFilters($rows, &$joins, $selects)
@@ -189,22 +180,21 @@ class TableGrid extends Component
             if (!$current_filter) {
                 continue;
             }
- 
+
             $current_filter['relationship'] = $current_filter['relationship'] ?? null;
-   
+
 
             if (!isset($filter['value1'])) {
                 $filter['value1'] = null;
-            }        
+            }
 
             $filter['value1'] = (string) $filter['value1'];
-     
-            
+
+
             // dd($current_filter['type']);
 
             try {
                 (new ($current_filter['type']))->handle($rows, $joins, $this->columns, $this->table, $current_filter, $filter);
-
             } catch (\Throwable $e) {
                 dd($e->getMessage(), $e->getTraceAsString());
             }
@@ -212,7 +202,7 @@ class TableGrid extends Component
 
         return $rows;
     }
- 
+
     public function clearFilters()
     {
         $this->reset(['filter']);
@@ -226,7 +216,7 @@ class TableGrid extends Component
     public function applyFilters()
     {
 
-     
+
         $this->enabledFilterCount = collect($this->filter)
             ->filter(fn($filter) => $filter['enabled'])
             ->count();
@@ -278,61 +268,60 @@ class TableGrid extends Component
         $selects = [];
 
         foreach ($this->table["columns"] as $column) {
-            $column["parameters"] = collect($column["parameters"])->map(fn($item) => str($item)->contains(".") ? $item : $this->table['name'].".".$item);
-            $relations =  collect($this->table['relationships'])->where('alias' , $column['alias']);
+            $column["parameters"] = collect($column["parameters"])->map(fn($item) => str($item)->contains(".") ? $item : $this->table['name'] . "." . $item);
+            $relations =  collect($this->table['relationships'])->where('alias', $column['alias']);
             $column["attributes"] = ['group_by' => $this->table["group"]];
-            $selects [] = (new $column['operator']($column['alias'] , $column["attributes"] , $relations))->get(...$column["parameters"]); 
+            $selects[] = (new $column['operator']($column['alias'], $column["attributes"], $relations))->get(...$column["parameters"]);
         }
 
-        $this->table['selects'] = collect($this->table['selects'])->map(fn($item) => $item .' AS '.str($item)->explode(".")[1])->toArray();
+        $this->table['selects'] = collect($this->table['selects'])->map(fn($item) => $item . ' AS ' . str($item)->explode(".")[1])->toArray();
 
-  
 
-        $selects = [...$this->table['selects'] , ...$selects];
+
+        $selects = [...$this->table['selects'], ...$selects];
 
         $selects = collect($selects)->unique()->filter()->values()->toArray();
 
-    
-       
+
+
         // dd($this->table['selects']);
-       
-        $rows = DB::table($this->table['name'])->select($selects)->whereNull($this->table['name'].".deleted_at");
+
+        $rows = DB::table($this->table['name'])->select($selects)->whereNull($this->table['name'] . ".deleted_at");
 
         foreach ($this->table["conditions"] ?? [] as $condition) {
-            apply_condition($rows , $condition);
+            apply_condition($rows, $condition);
         }
 
 
 
         $rows = $this->setFilters($rows, $joins, $selects);
-   
-    
+
+
         foreach ($this->table["relationships"] as $relation_table => $relationship) {
 
-            if($relationship['type'] == 'polyBelongsTo'){
+            if ($relationship['type'] == 'polyBelongsTo') {
 
                 $rows->leftJoin($relationship["table"], function ($join) use ($relationship) {
-                    $join->on($this->table['name'].'.'.$relationship['foreign_key'], '=', $relationship["table"].'.id')
-                         ->where($this->table['name'].'.'.$relationship['foreign_type'], '=',  $relationship["value"])
-                         ->whereNull($relationship["table"].'.deleted_at');
+                    $join->on($this->table['name'] . '.' . $relationship['foreign_key'], '=', $relationship["table"] . '.id')
+                        ->where($this->table['name'] . '.' . $relationship['foreign_type'], '=',  $relationship["value"])
+                        ->whereNull($relationship["table"] . '.deleted_at');
 
 
-                       
 
-                         foreach ($relationship['conditions'] ?? [] as $condition) {
-                            apply_condition($join , $condition);
-                        }
 
+                    foreach ($relationship['conditions'] ?? [] as $condition) {
+                        apply_condition($join, $condition);
+                    }
                 });
 
                 continue;
             }
-   
 
 
 
 
-            if(!in_array($relationship['type'] , ['hasMany' , 'belongsTo'])){
+
+            if (!in_array($relationship['type'], ['hasMany', 'belongsTo'])) {
                 continue;
             }
 
@@ -340,84 +329,82 @@ class TableGrid extends Component
 
 
 
-           
-            if($relationship['left_join']){
 
-           
-            $rows->leftJoin($relation_table, function ($q) use ($relation_table , $relationship) {
-
-                $current_table = $this->table['name'];
-
-                switch($relationship['type']){
-                    case "hasMany" :
-
-                        $param1 =  "$current_table.id";
-                        $param2 = $relation_table . "." . $relationship['foreign_key'];
-
-                        break;
-                    
-                    case "belongsTo":
-
-                        $param1 = "$current_table." . $relationship['foreign_key'];
-                        $param2 = $relation_table . ".id";
-                        
-                        break;
-                }
-
-                $q->on($param1, '=', $param2)->whereNull($relation_table. ".deleted_at");
+            if ($relationship['left_join']) {
 
 
-               
-         
-                
-                foreach ($relationship['conditions'] ?? [] as $condition) {
-                    apply_condition($q , $condition);
-                }
-
-            });
-            }else{
-                $rows->join($relation_table, function ($q) use ($relation_table , $relationship) {
+                $rows->leftJoin($relation_table, function ($q) use ($relation_table, $relationship) {
 
                     $current_table = $this->table['name'];
-    
-                    switch($relationship['type']){
-                        case "hasMany" :
-    
+
+                    switch ($relationship['type']) {
+                        case "hasMany":
+
                             $param1 =  "$current_table.id";
                             $param2 = $relation_table . "." . $relationship['foreign_key'];
-    
+
                             break;
-                        
+
                         case "belongsTo":
-    
+
                             $param1 = "$current_table." . $relationship['foreign_key'];
                             $param2 = $relation_table . ".id";
-                            
+
                             break;
                     }
-    
-                    $q->on($param1, '=', $param2)->whereNull($relation_table. ".deleted_at");
-    
-                    
-                    
+
+                    $q->on($param1, '=', $param2)->whereNull($relation_table . ".deleted_at");
+
+
+
+
+
                     foreach ($relationship['conditions'] ?? [] as $condition) {
-                        apply_condition($q , $condition);
+                        apply_condition($q, $condition);
                     }
-    
+                });
+            } else {
+                $rows->join($relation_table, function ($q) use ($relation_table, $relationship) {
+
+                    $current_table = $this->table['name'];
+
+                    switch ($relationship['type']) {
+                        case "hasMany":
+
+                            $param1 =  "$current_table.id";
+                            $param2 = $relation_table . "." . $relationship['foreign_key'];
+
+                            break;
+
+                        case "belongsTo":
+
+                            $param1 = "$current_table." . $relationship['foreign_key'];
+                            $param2 = $relation_table . ".id";
+
+                            break;
+                    }
+
+                    $q->on($param1, '=', $param2)->whereNull($relation_table . ".deleted_at");
+
+
+
+                    foreach ($relationship['conditions'] ?? [] as $condition) {
+                        apply_condition($q, $condition);
+                    }
                 });
             }
         }
 
-        if($this->table["group"]){
+        if ($this->table["group"]) {
 
-            if(!is_array($this->table["group"])){
+            if (!is_array($this->table["group"])) {
                 $this->table["group"] = [$this->table["group"]];
             }
 
             $rows->groupBy(...$this->table["group"]);
         }
 
-     
+
 
         $available_sorting_columns = collect($selects)->map(function ($item) {
 
@@ -434,7 +421,7 @@ class TableGrid extends Component
             return trim($array[0]);
         })->toArray();
 
-      
+
         if (
             !empty($this->sorting_column) &&
             !empty($this->sorting_direction) &&
@@ -447,12 +434,12 @@ class TableGrid extends Component
         }
 
 
-        
+
         // dd($rows);
 
         $rows = $rows->paginate(20)->through(function ($row) {
 
-            
+
             $row = (array) $row;
 
             // foreach ($this->table["callbacks"] as $callback) {
@@ -470,96 +457,55 @@ class TableGrid extends Component
 
 
 
- 
+
 
 
         return view('UIKitView::components.table-grid', ['rows' => $rows]);
     }
-    // public function handleDelete($selected)
-    // {
-
-
-    //     if ($this->entity['gridRules'] ?? null) {
-
-    //         $deleteRule = collect($this->entity['gridRules'])->where('operation', 'delete')->first();
-
-    //         if ($deleteRule) {
-
-    //             $ids =   DB::table($this->entity['table'])
-    //                 ->where($deleteRule['condition']['field'], $deleteRule['condition']['operand'], $deleteRule['condition']['value'])
-    //                 ->pluck('id');
-
-    //             $intersectionFound = collect($selected)->intersect($ids)->count() > 0;
-
-    //             if ($intersectionFound) {
-    //                 $this->render();
-    //                 $this->sendError("Not Deleted", "You don't have permission to delete this record");
-    //                 return response()->json(["result" => true], 200);
-    //             }
-    //         }
-    //     }
-
-
-    //     // dd($selected);
-
-    //     try {
-
-    //         DB::beginTransaction();
-
-    //         if (!is_array($selected)) {
-    //             $selected = json_decode($selected, 1);
-    //         }
-
-    //         if (!is_array($selected)) {
-    //             return;
-    //         }
-
-    //         DB::table($this->entity['table'])->whereIn('id', $selected)->update([
-    //             'deleted_at' =>  now()
-    //         ]);
-
-
-    //         DB::commit();
-
-    //         $this->render();
-
-    //         $this->sendSuccess("Deleted", "Record sucessfully deleted");
-
-    //         return response()->json(["result" => true], 200);
-    //     } catch (\Throwable $th) {
-
-    //         DB::rollBack();
-
-    //         $this->render();
-
-    //         $this->sendError("Not Deleted", "Record was not deleted");
-
-    //         return response()->json(["result" => false], 200);
-    //     }
-    // }
-
-
+   
 
     public function handleDelete($selected)
     {
 
+        
+
         if (!is_array($selected) || empty($selected)) {
             $this->sendError("Error", "Invalid selection.");
-           
-        }    
+        }
         try {
-            DB::table($this->table['name'])->whereIn('id', $selected)->update([
-                'deleted_at' =>  now()
-            ]);
 
-        
+            if (isset($this->table['affected_on_deletion'])) {
+                $affectedColumn = $this->table['affected_on_deletion'];
+
+
+                $affectedValue = DB::table($this->table['name'])
+                    ->whereIn('id', $selected)
+                    ->pluck($affectedColumn);
+
+
+                if (!$affectedValue) {
+                    $this->sendError("Error", "No matching affected value found.");
+                    return;
+                }
+
+
+                DB::table($this->table['name'])
+                    ->whereIn($affectedColumn, $affectedValue)
+                    ->update([
+                        'deleted_at' => now()
+                    ]);
+            } else {
+                DB::table($this->table['name'])->whereIn('id', $selected)->update([
+                    'deleted_at' =>  now()
+                ]);
+            }
+
+
             $this->sendSuccess("Deleted", "Record(s) successfully deleted.");
-            $this->render(); 
-    
+            $this->render();
         } catch (\Throwable $e) {
-           
+
             $this->sendError("Error", "Could not delete records.");
         }
     }
-    
 }

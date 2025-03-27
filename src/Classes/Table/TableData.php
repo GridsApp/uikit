@@ -2,6 +2,8 @@
 
 namespace twa\uikit\Classes\Table;
 
+use Illuminate\Support\Facades\DB;
+
 class TableData
 {
 
@@ -17,6 +19,7 @@ class TableData
     public $group = null;
     public $filters = [];
     public $selects = [];
+    public $affected_on_deletion = null;
 
 
     public function __construct($title, $table)
@@ -27,6 +30,12 @@ class TableData
     }
 
 
+    public function setAffectedOnDeletion($value) 
+    {
+        $this->affected_on_deletion = $value;  
+        return $this;
+    }
+
     public function groupBy()
     {
 
@@ -34,8 +43,15 @@ class TableData
         $columns = collect($columns)->flatten(1);
 
         $this->group =  $columns->map(function ($item) {
+
+            if(str($item)->contains('COALESCE')){
+                return $item;
+            }
+
             return str($item)->contains(".") ? $item : $this->table . '.' . $item;
         })->toArray();
+
+
 
         return $this;
     }
@@ -99,12 +115,13 @@ class TableData
         return $this;
     }
 
-    public function addRowOperation($label, $link, $icon)
+    public function addRowOperation($label, $link, $icon , $columns = ['id'])
     {
         $this->row_operations[] = [
             'label' => $label,
             'link' => $link,
             'icon' => $icon,
+            'columns' => $columns
 
         ];
         return $this;
@@ -268,8 +285,8 @@ class TableData
             'columns' => $this->columns,
             'filters' => $this->filters,
             'table_operations' => $this->table_operations,
-            'row_operations' => $this->row_operations
-       
+            'row_operations' => $this->row_operations,
+            'affected_on_deletion' => $this->affected_on_deletion
 
         ];
     }

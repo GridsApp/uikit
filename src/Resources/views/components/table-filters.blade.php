@@ -31,7 +31,7 @@
                 <div class="text font-bold text-[12px]">Filters</div>
                 <div>
                     <button wire:click="applyFilters()"
-                        class="bg-primary-500 text-[10px] px-3 py-1 text-white rounded-md">Apply
+                        class="bg-twafieldsprimary-500 text-[10px] px-3 py-1 text-white rounded-md">Apply
                     </button>
                 </div>
             </div>

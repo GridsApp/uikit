@@ -16,6 +16,12 @@ module.exports = {
             twafieldsprimary: colors.blue,
             twafieldssecondary: colors.slate,
             twafieldsdark: colors.slate,
+            dark: { 
+              900: "#111827",
+          },
+          primary: {
+            50: "#e0f2fe", 
+          },
             twafieldsgray: {
                 50: "#f9fafb",
                 100: "#f3f4f6",

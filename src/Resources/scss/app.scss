@@ -45,19 +45,11 @@ $font-family: "Inter", sans-serif;
 //     outline: none !important;
 // }
 
-// input[type="number"] {
-//     -moz-appearance: textfield;
-
-//     &::-webkit-inner-spin-button,
-//     &::-webkit-outer-spin-button {
-//         -webkit-appearance: none;
-//         margin: 0;
-//     }
-// }
 
 .container-fixed-header {
     flex-grow: 1;
     width: 100%;
+
 }
 @media (min-width: 1280px) {
     .container-fixed-header {
