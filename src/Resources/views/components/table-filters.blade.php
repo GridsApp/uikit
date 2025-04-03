@@ -2,8 +2,6 @@
     $filters = collect($filters);
 @endphp
 
-
-{{-- @dd($filters); --}}
 <div x-data="window.Functions.initFilter()" class="filter-dropdown-container" x-on:clear-filters.window="open = false"
     x-on:apply-filters.window="open = false">
     @if ($filters->count() > 0)
@@ -37,7 +35,6 @@
             </div>
         </div>
         <div class="filter-box">
-            {{-- @dd($filters); --}}
             @foreach ($filters as $filter)
           
                 @php

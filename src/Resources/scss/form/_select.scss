@@ -62,7 +62,7 @@ select {
             }
 
             .twa-select-selection-box {
-                @apply gap-1 dark:text-twafieldsdark-100 dark:bg-twafieldsdark-700 dark:ring-twafieldsdark-600 inline-flex h-6 items-center space-x-1 rounded-lg bg-twafieldsgray-100 px-2 text-sm font-medium text-twafieldsgray-600 ring-1 ring-inset ring-twafieldsgray-200;
+                @apply gap-1 pointer-events-auto dark:text-twafieldsdark-100 dark:bg-twafieldsdark-700 dark:ring-twafieldsdark-600 inline-flex h-6 items-center space-x-1 rounded-lg bg-twafieldsgray-100 px-2 text-sm font-medium text-twafieldsgray-600 ring-1 ring-inset ring-twafieldsgray-200;
             }
 
             .twa-select-selections-remove {

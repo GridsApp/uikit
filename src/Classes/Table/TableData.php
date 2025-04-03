@@ -16,6 +16,7 @@ class TableData
     public $columns = [];
     public $table_operations = [];
     public $row_operations = [];
+    public $disable_delete;
     public $group = null;
     public $filters = [];
     public $selects = [];
@@ -100,6 +101,13 @@ class TableData
             'callabck' => $callback
         ];
 
+        return $this;
+    }
+
+  
+    public function disableDelete() 
+    {
+        $this->disable_delete = true;  
         return $this;
     }
 
@@ -286,7 +294,8 @@ class TableData
             'filters' => $this->filters,
             'table_operations' => $this->table_operations,
             'row_operations' => $this->row_operations,
-            'affected_on_deletion' => $this->affected_on_deletion
+            'affected_on_deletion' => $this->affected_on_deletion,
+            'disable_delete' => $this->disable_delete,
 
         ];
     }

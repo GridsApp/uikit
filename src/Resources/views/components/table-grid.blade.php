@@ -20,12 +20,18 @@
                 <div>
                     @include('UIKitView::components.table-filters')
                 </div>
+        
                 <template x-if="selected.length > 0">
                     <div class="flex gap-5 items-center">
 
 
+                        
+
+                     
                         <div x-data="{ showModal: false, handleOpen() { this.showModal = true } }">
-                            {!! button("'Delete ('+ selected.length + ')'", 'danger', null, 'button', null, 'handleOpen') !!}
+                            @if(!$this->table['disable_delete'])
+   
+                            {{-- {!! button("'Delete ('+ selected.length + ')'", 'danger', null, 'button', null, 'handleOpen') !!} --}}
 
                             @component('UIKitView::components.modal', [
                                 'title' => 'Delete',
@@ -40,10 +46,14 @@
                                     Are you sure you want to delete records?
                                 </div>
                             @endcomponent
+                            
+                            @endif
                         </div>
 
+               
                     </div>
                 </template>
+              
                 @foreach ($table_operations as $index => $table_operation)
                     @if ($index == 0)
                         <template x-if="selected.length == 0">

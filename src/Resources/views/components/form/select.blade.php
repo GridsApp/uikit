@@ -19,7 +19,7 @@
                         @endif
                         <span class="selected-class" x-text="selectedOption.label"></span>
                         @if ($info['multiple'])
-                            <button class="w-[20px]" @click="handleClearSelection($event, selectedOption.label)"
+                            <button class="w-[20px] pointer-events-auto" @click="handleClearSelection($event, selectedOption.identifier)"
                                 type="button" role="button">
                                 @include('UIKitView::components.icons.cross')
                             </button>

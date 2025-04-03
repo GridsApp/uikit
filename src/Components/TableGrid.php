@@ -190,9 +190,6 @@ class TableGrid extends Component
 
             $filter['value1'] = (string) $filter['value1'];
 
-
-            // dd($current_filter['type']);
-
             try {
                 (new ($current_filter['type']))->handle($rows, $joins, $this->columns, $this->table, $current_filter, $filter);
             } catch (\Throwable $e) {
@@ -210,13 +207,10 @@ class TableGrid extends Component
 
         $this->dispatch('clear-filters');
         $this->enabledFilterCount = 0;
-        // $this->resetPage();
     }
 
     public function applyFilters()
     {
-
-
         $this->enabledFilterCount = collect($this->filter)
             ->filter(fn($filter) => $filter['enabled'])
             ->count();
@@ -261,8 +255,6 @@ class TableGrid extends Component
 
     public function render()
     {
-
-
         $selects = [];
         $joins = [];
         $selects = [];
@@ -282,25 +274,17 @@ class TableGrid extends Component
 
         $selects = collect($selects)->unique()->filter()->values()->toArray();
 
-
-
-        // dd($this->table['selects']);
-
         $rows = DB::table($this->table['name'])->select($selects)->whereNull($this->table['name'] . ".deleted_at");
 
         foreach ($this->table["conditions"] ?? [] as $condition) {
             apply_condition($rows, $condition);
         }
 
-
-
         $rows = $this->setFilters($rows, $joins, $selects);
-
 
         foreach ($this->table["relationships"] as $relation_table => $relationship) {
 
             if ($relationship['type'] == 'polyBelongsTo') {
-
                 $rows->leftJoin($relationship["table"], function ($join) use ($relationship) {
                     $join->on($this->table['name'] . '.' . $relationship['foreign_key'], '=', $relationship["table"] . '.id')
                         ->where($this->table['name'] . '.' . $relationship['foreign_type'], '=',  $relationship["value"])
@@ -317,24 +301,11 @@ class TableGrid extends Component
                 continue;
             }
 
-
-
-
-
             if (!in_array($relationship['type'], ['hasMany', 'belongsTo'])) {
                 continue;
             }
-
-
-
-
-
-
             if ($relationship['left_join']) {
-
-
                 $rows->leftJoin($relation_table, function ($q) use ($relation_table, $relationship) {
-
                     $current_table = $this->table['name'];
 
                     switch ($relationship['type']) {
@@ -355,17 +326,12 @@ class TableGrid extends Component
 
                     $q->on($param1, '=', $param2)->whereNull($relation_table . ".deleted_at");
 
-
-
-
-
                     foreach ($relationship['conditions'] ?? [] as $condition) {
                         apply_condition($q, $condition);
                     }
                 });
             } else {
                 $rows->join($relation_table, function ($q) use ($relation_table, $relationship) {
-
                     $current_table = $this->table['name'];
 
                     switch ($relationship['type']) {
@@ -462,12 +428,16 @@ class TableGrid extends Component
 
         return view('UIKitView::components.table-grid', ['rows' => $rows]);
     }
-   
+
 
     public function handleDelete($selected)
     {
+        // dd($this->table);
 
-        
+        if (isset($this->table['disable_delete']) && $this->table['disable_delete']) {
+            $this->sendError("Error", "Deletion is disabled for this table.");
+            return;
+        }
 
         if (!is_array($selected) || empty($selected)) {
             $this->sendError("Error", "Invalid selection.");

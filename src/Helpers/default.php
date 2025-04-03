@@ -191,6 +191,8 @@ if (!function_exists('get_menu')) {
             return null;
         }
         $menu = $menu->map(function ($item) {
+
+
             return process_menu_item($item);
         });
 
@@ -198,26 +200,116 @@ if (!function_exists('get_menu')) {
     }
 }
 
+if (!function_exists('cms_check_permission')) {
+    function cms_check_permission($key)
+    {
+        // dump($key);
+        // if (cms_check_permission("create-" . $this->slug)) 
+        // dd(request()->permissions);
+        $permissions = request()->permissions ?? []; 
+
+        // dd($permissions , $key);
+        // dd('view-transactions',$permissions);
+       
+        return in_array($key, $permissions);
+    }
+}
+// if (!function_exists('process_menu_item')) {
+//     function process_menu_item($item)
+//     {
+//         $item['display'] = true;
+
+//         if (isset($item['link'])) {
+
+
+//             if ($item['link']['name'] ?? '' == 'entity') {
+//                 $key = 'show-' . $item['link']['params']['slug'];
+//                 if (!cms_check_permission($key)) {
+//                     // dd($item);
+//                     $item['display'] = false;
+//                 }
+//             }
+
+//             $item['link'] = get_route_object_link($item['link']);
+//         }
+
+
+//         if (isset($item['children']) && is_array($item['children'])) {
+
+//             $item['children'] = array_map('process_menu_item', $item['children']);
+//         }
+
+
+
+//         return $item;
+//     }
+// }
 if (!function_exists('process_menu_item')) {
     function process_menu_item($item)
     {
        
-        if (isset($item['link'])) {
-    
-
-      
-            $item['link'] = get_route_object_link($item['link']);
-
-           
-            
+        if (!isset($item['display'])) {
+            $item['display'] = true;
         }
+
 
        
-        if (isset($item['children']) && is_array($item['children'])) {
+        if ($item['display'] === false) {
            
-            $item['children'] = array_map('process_menu_item', $item['children']);
+            return $item;
+        }
+  
+
+     
+        if (isset($item['link']) && is_array($item['link'])) {
+         
+            if (isset($item['link']['name']) && $item['link']['name'] === 'entity') {
+         
+                $key = 'show-' . $item['link']['params']['slug'];
+               
+                // dd($key);
+
+                if (!cms_check_permission($key)) {
+                    
+                    $item['display'] = false;
+                }
+            }
+
+           
+            $item['link'] = get_route_object_link($item['link']);
         }
 
+;
+        
+        if (isset($item['permissions']) && is_array($item['permissions'])) {
+         
+
+            foreach ($item['permissions'] as $permission) {
+                $key = $permission['key'] ?? '';
+                // dd(cms_check_permission($key));
+                if (!cms_check_permission($key)) {
+                    
+                    $item['display'] = false;
+                }
+            }
+
+  
+            
+        }       
+
+
+        if (isset($item['children']) && is_array($item['children'])) {
+            $item['children'] = array_map('process_menu_item', $item['children']);
+
+            
+            $hasVisibleChildren = array_filter($item['children'], fn($child) => $child['display'] ?? false);
+            if (empty($hasVisibleChildren) && !isset($item['permissions'])) {
+                $item['display'] = false;
+            }
+        }
+    
         return $item;
     }
 }
+
+

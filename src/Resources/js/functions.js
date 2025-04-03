@@ -23,7 +23,6 @@ export default class Functions {
             },
         };
     }
-
     initSelect(maxVisibleSelections, dispatchInit, dispatchChanged) {
         return {
             open: false,
@@ -42,11 +41,18 @@ export default class Functions {
                 this.options = [];
                 this.multiple = Array.isArray(this.$wire.value);
 
-                this.selectedValues = this.$wire.value;
+                this.selectedValues = this.multiple
+                    ? [...(this.$wire.value || [])].map(String)
+                    : this.$wire.value
+                    ? String(this.$wire.value)
+                    : null;
+
                 this.selectedOptions = this.selectedOptions || [];
 
+                this.isRemovingItem = false;
+
                 this.$watch("selectedValues", (value) => {
-                    let values;
+                    if (this.isRemovingItem) return;
 
                     const optionsArray = collect([...this.options]).map(
                         (item) => {
@@ -55,29 +61,31 @@ export default class Functions {
                         }
                     );
 
+                    let values;
+
                     if (this.multiple) {
-                        values = collect(value)
-                            .map((item) => String(item))
-                            .toArray();
+                        values = collect(value).map(String).toArray();
                         this.selectedOptions = optionsArray
                             .whereIn("value", values)
                             .toArray();
 
-                        if (this.selectedValues.length == 0) {
+                        if (values.length === 0) {
                             this.open = false;
                         }
                     } else {
-                        values = String(value);
-                        this.selectedOptions = optionsArray
-                            .whereIn("value", [values])
-                            .toArray();
+                        values = value ? String(value) : null;
+                        this.selectedOptions = value
+                            ? optionsArray.whereIn("value", [values]).toArray()
+                            : [];
                         this.open = false;
                     }
 
                     this.$wire.value = values;
 
-                    if (dispatchChanged != "") {
-                        this.$dispatch(dispatchChanged, { selected: values });
+                    if (this.dispatchChanged) {
+                        this.$dispatch(this.dispatchChanged, {
+                            selected: values,
+                        });
                     }
                 });
 
@@ -201,30 +209,257 @@ export default class Functions {
                 }
             },
 
-            handleClearSelection(event, optionLabel) {
+            handleClearSelection(event, optionIdentifier) {
                 event.stopPropagation();
-                if (this.selectedOptions) {
-                    this.selectedOptions = this.selectedOptions.filter(
-                        (option) => option.label !== optionLabel
-                    );
+                event.preventDefault();
 
-                    if (this.multiple) {
-                        this.selectedValues = this.selectedOptions.map(
-                            (option) => option.value
+                if (this.multiple) {
+                    this.isRemovingItem = true;
+
+                    try {
+                        const currentValues = [...this.selectedValues].map(
+                            String
+                        );
+                        const currentOptions = [...this.selectedOptions];
+
+                        const optionToRemove = currentOptions.find(
+                            (opt) =>
+                                opt.identifier.trim().toLowerCase() ===
+                                optionIdentifier.trim().toLowerCase()
                         );
 
-                        this.$wire.value = this.selectedValues;
+                        if (optionToRemove) {
+                            const valueToRemove = String(optionToRemove.value);
 
-                        if (this.selectedValues.length == 0) {
-                            this.open = false;
+                            const newValues = currentValues.filter(
+                                (v) => v !== valueToRemove
+                            );
+                            const newOptions = currentOptions.filter(
+                                (o) => String(o.value) !== valueToRemove
+                            );
+
+                            this.selectedValues = newValues;
+                            this.selectedOptions = newOptions;
+                            this.$wire.value = newValues;
+
+                         
                         }
-                    } else {
-                        this.$wire.value = null;
+                    } catch (error) {
+                        console.error("Error removing item:", error);
+                    } finally {
+                        setTimeout(() => {
+                            this.isRemovingItem = false;
+                        }, 100);
                     }
                 }
             },
         };
     }
+
+    // initSelect(maxVisibleSelections, dispatchInit, dispatchChanged) {
+    //     return {
+    //         open: false,
+    //         search: "",
+    //         multiple: false,
+    //         loading: false,
+
+    //         selectedValues: null,
+    //         selectedOptions: null,
+    //         options: [],
+    //         maxVisibleSelections: maxVisibleSelections,
+    //         showMore: false,
+    //         drawerOpen: false,
+
+
+    
+    //         init() {
+    //             this.options = [];
+    //             this.multiple = Array.isArray(this.$wire.value);
+
+    //             this.selectedValues = this.$wire.value;
+    //             this.selectedOptions = this.selectedOptions || [];
+
+    //             this.$watch("selectedValues", (value) => {
+    //                 let values;
+
+    //                 const optionsArray = collect([...this.options]).map(
+    //                     (item) => {
+    //                         item.value = String(item.value);
+    //                         return item;
+    //                     }
+    //                 );
+
+    //                 if (this.multiple) {
+    //                     values = collect(value)
+    //                         .map((item) => String(item))
+    //                         .toArray();
+    //                     this.selectedOptions = optionsArray
+    //                         .whereIn("value", values)
+    //                         .toArray();
+
+    //                     if (this.selectedValues.length == 0) {
+    //                         this.open = false;
+    //                     }
+    //                 } else {
+    //                     values = String(value);
+    //                     this.selectedOptions = optionsArray
+    //                         .whereIn("value", [values])
+    //                         .toArray();
+    //                     this.open = false;
+    //                 }
+
+    //                 this.$wire.value = values;
+
+    //                 if (dispatchChanged != "") {
+    //                     this.$dispatch(dispatchChanged, { selected: values });
+    //                 }
+    //             });
+
+    //             if (dispatchInit != "") {
+    //                 setTimeout(() => {
+    //                     this.$dispatch(dispatchInit, {
+    //                         selected: this.selectedValues,
+    //                     });
+    //                 }, 0);
+    //             }
+
+    //             if (
+    //                 (!this.multiple && this.selectedValues != null) ||
+    //                 (this.multiple && this.selectedValues.length > 0)
+    //             ) {
+    //                 this.getSelectedOptions();
+    //             }
+    //         },
+
+    //         get visibleOptions() {
+    //             if (this.multiple) {
+    //                 if (this.showMore) {
+    //                     return this.selectedOptions;
+    //                 }
+    //                 return this.selectedOptions.slice(
+    //                     0,
+    //                     this.maxVisibleSelections
+    //                 );
+    //             } else {
+    //                 console.log(this.selectedOptions);
+    //                 return this.selectedOptions;
+    //             }
+    //         },
+
+    //         get hiddenOptions() {
+    //             return this.multiple
+    //                 ? Array.isArray(this.selectedOptions) &&
+    //                   this.selectedOptions.length > 0
+    //                     ? this.selectedOptions.slice(this.maxVisibleSelections)
+    //                     : []
+    //                 : this.maxVisibleSelections;
+    //         },
+
+    //         handleCreateCallback(event) {
+    //             if (this.multiple) {
+    //                 this.selectedValues.push(event.detail.id);
+    //                 this.$wire.value.push(event.detail.id);
+    //             } else {
+    //                 this.selectedValues = [event.detail.id];
+    //                 this.$wire.value = event.detail.id;
+    //             }
+
+    //             if (dispatchChanged != "") {
+    //                 this.$dispatch(dispatchChanged, {
+    //                     selected: this.$wire.value,
+    //                 });
+    //             }
+
+    //             this.getSelectedOptions();
+    //         },
+
+    //         showMoreHandler(event) {
+    //             event.stopPropagation();
+    //             this.showMore = !this.showMore;
+    //         },
+
+    //         async searchHandler() {
+    //             this.getOptions();
+    //         },
+
+    //         async getSelectedOptions() {
+    //             let response = await this.$wire.getOptions(
+    //                 null,
+    //                 this.selectedValues
+    //             );
+
+    //             this.selectedOptions = [...response.original];
+
+    //             this.drawerOpen = false;
+    //         },
+
+    //         async getOptions() {
+    //             this.loading = true;
+    //             let response = await this.$wire.getOptions(this.search);
+
+    //             this.options = [...response.original];
+
+    //             this.loading = false;
+    //         },
+
+    //         async openOptions() {
+    //             if (this.open) {
+    //                 this.open = false;
+    //             } else {
+    //                 this.open = true;
+    //                 if (this.options.length == 0) {
+    //                     this.getOptions();
+    //                 }
+    //             }
+    //         },
+
+    //         openQuickAdd(event) {
+    //             event.stopPropagation();
+    //             this.open = false;
+    //             this.drawerOpen = !this.drawerOpen;
+    //         },
+
+    //         async handleClear(event) {
+    //             event.stopPropagation();
+    //             this.search = "";
+    //             this.getOptions();
+
+    //             this.selectedOptions = this.multiple ? [] : null;
+    //             this.selectedValues = this.multiple ? [] : null;
+    //             this.$wire.value = this.multiple ? [] : null;
+
+    //             if (dispatchChanged != "") {
+    //                 this.$dispatch(dispatchChanged, {
+    //                     selected: null,
+    //                 });
+    //             }
+    //         },
+
+    //         handleClearSelection(event, optionLabel) {
+    //             event.stopPropagation();
+    //             if (this.selectedOptions) {
+    //                 this.selectedOptions = this.selectedOptions.filter(
+    //                     (option) => option.label !== optionLabel
+    //                 );
+
+    //                 if (this.multiple) {
+
+    //                     this.selectedValues = this.selectedOptions.map(
+    //                         (option) => option.value
+    //                     );
+
+    //                     this.$wire.value = this.selectedValues;
+
+    //                     if (this.selectedValues.length == 0) {
+    //                         this.open = false;
+    //                     }
+    //                 } else {
+    //                     this.$wire.value = null;
+    //                 }
+    //             }
+    //         },
+    //     };
+    // }
 
     updateLabel(value) {
         document.getElementById("label-field").value = `Theater ${value}`;
@@ -965,7 +1200,6 @@ export default class Functions {
     }
 
     TWAToast(title, description, type, position) {
-       
         window.dispatchEvent(
             new CustomEvent("toast-show", {
                 detail: {
@@ -988,8 +1222,7 @@ export default class Functions {
             position: "top-center",
             paddingBetweenToasts: 15,
             init() {
-
-              // console.log("here")
+                // console.log("here")
                 if (this.position.includes("bottom")) {
                     this.$el.firstElementChild.classList.add("toast-bottom");
                     this.$el.firstElementChild.classList.add(

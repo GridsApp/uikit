@@ -6,34 +6,29 @@
 
     @foreach ($table['row_operations'] as $row_operation)
         {{-- @dd( $row_operation['link']); --}}
-        <div x-cloak 
-        {{-- x-show="actions.allowEdit"  --}}
-        class="dropdown-menu-item">
+        <div x-cloak {{-- x-show="actions.allowEdit"  --}} class="dropdown-menu-item">
 
             @php
 
                 $link = Str($row_operation['link']);
 
-              
-               foreach($row_operation['columns'] ?? [] as $row_column){
-                // dd($family_group_id); 
-               $link = $link->replace("{".$row_column."}", $row->{$row_column});
-               }
-               $link = $link->toString();
+                foreach ($row_operation['columns'] ?? [] as $row_column) {
+                    // dd($family_group_id);
+                    $link = $link->replace('{' . $row_column . '}', $row->{$row_column});
+                }
+                $link = $link->toString();
 
-              
             @endphp
 
-            <a href="{{$link}}" class="dropdown-menu-link">
+            <a href="{{ $link }}" class="dropdown-menu-link">
                 <span class="dropdown-menu-icon">{!! $row_operation['icon'] !!}</span>
                 <span class="dropdown-menu-title">{{ $row_operation['label'] }}</span>
             </a>
         </div>
     @endforeach
-    <div x-cloak x-show="actions.allowDelete" class="dropdown-menu-item"
-    
-     x-data="{ showModal: false, handleOpen() { this.showModal = true } }"
+    <div x-cloak x-show="actions.allowDelete" class="dropdown-menu-item" x-data="{ showModal: false, handleOpen() { this.showModal = true } }"
         @click.away="showModal = false" @click="handleOpen">
+        @if(!$this->table['disable_delete'])
         <div class="dropdown-menu-link">
             <span class="dropdown-menu-icon"> <i class="fa-solid fa-trash-can"></i></span>
 
@@ -56,5 +51,6 @@
                 @endcomponent
             </div>
         </div>
+        @endif
     </div>
 </div>
