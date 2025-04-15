@@ -10,6 +10,10 @@ class Tags extends DefaultType
     public function html($parameters = [])
     {
 
+        if(is_null($this->input)){
+            $this->input = '[]';
+        }
+
         if(json_validate($this->input)){
             $this->input = json_decode($this->input , 1);
         }
@@ -18,9 +22,13 @@ class Tags extends DefaultType
             $this->input = [$this->input];
         }
 
-        if (empty($this->input)) {
-            return ''; 
+
+       
+        if (count($this->input) == 0) {
+          
+            return '-'; 
         }
+       
 
         $count= count($this->input);
         $nb = 1;

@@ -17,6 +17,7 @@
                     </span>
                 </div>
             </div>
+           
             <div x-show="show" x-cloak class="absolute top100pers z-40 rounded-lg border bg-white p-3 w-full">
                 <div class="flex flex-col w-full items-center justify-center">
                     <div

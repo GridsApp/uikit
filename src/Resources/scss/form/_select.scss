@@ -70,7 +70,7 @@ select {
             }
         }
         .twa-select-options-container {
-            @apply absolute top100pers right-0 left-0 min-h-[100px]  dark:bg-twafieldsdark-700  border-twafieldsdark-300 dark:border-twafieldsdark-300 z-40 rounded-lg border bg-white w-full overflow-auto;
+            @apply absolute top100pers right-0 left-0 min-h-[100px]  dark:bg-twafieldsdark-700  border-twafieldsdark-300 dark:border-twafieldsdark-300 z-[45] rounded-lg border bg-white w-full overflow-auto;
 
             .twa-select-search-container {
                 @apply relative mt-1 rounded-md shadow-sm;

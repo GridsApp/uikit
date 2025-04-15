@@ -6,9 +6,6 @@ namespace twa\uikit\Components;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
-use Livewire\Attributes\On;
-use Livewire\Attributes\Url;
-use Illuminate\Database\Query\Expression;
 use twa\uikit\Traits\ToastTrait;
 
 class TableGrid extends Component

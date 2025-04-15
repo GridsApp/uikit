@@ -6,7 +6,7 @@
         <div
             class=" twa-form-input-ring">
             <input wire:model="value" type="date"
-                class="twa-form-input">
+                class="twa-form-input date">
         </div>
     </div>
     @error(get_field_modal($info) ?? 'value')

@@ -23,15 +23,11 @@
         
                 <template x-if="selected.length > 0">
                     <div class="flex gap-5 items-center">
-
-
-                        
-
                      
                         <div x-data="{ showModal: false, handleOpen() { this.showModal = true } }">
                             @if(!$this->table['disable_delete'])
    
-                            {{-- {!! button("'Delete ('+ selected.length + ')'", 'danger', null, 'button', null, 'handleOpen') !!} --}}
+                            {!! button("'Delete ('+ selected.length + ')'", 'danger', null, 'button', null, 'handleOpen') !!}
 
                             @component('UIKitView::components.modal', [
                                 'title' => 'Delete',
