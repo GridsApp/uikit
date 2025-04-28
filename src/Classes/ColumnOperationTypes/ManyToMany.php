@@ -22,7 +22,16 @@ class ManyToMany extends DefaultOperationType
             return null;
         }
 
-        return DB::raw('(SELECT JSON_ARRAYAGG('.$table.'.'.$field.') FROM JSON_TABLE('.$arg.', "$[*]" COLUMNS (json TEXT PATH "$")) AS jt JOIN '.$table.' ON CAST(jt.json AS UNSIGNED) = '.$table.'.id) AS '.$this->alias);
+        if(env('DB_CONNECTION') == 'pgsql'){
+            return DB::raw('(
+                SELECT json_agg('.$table.'.'.$field.')
+                FROM jsonb_array_elements_text(('.$arg.')::jsonb) AS jt(json)
+                JOIN '.$table.' ON jt.json::INTEGER = '.$table.'.id
+                ) AS '.$this->alias);
+        }else{
+            return DB::raw('(SELECT JSON_ARRAYAGG('.$table.'.'.$field.') FROM JSON_TABLE('.$arg.', "$[*]" COLUMNS (json TEXT PATH "$")) AS jt JOIN '.$table.' ON CAST(jt.json AS UNSIGNED) = '.$table.'.id) AS '.$this->alias);
+        }
+
     }
 
 
