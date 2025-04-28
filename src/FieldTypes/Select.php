@@ -34,7 +34,6 @@ class Select extends FieldType
     }
 
 
-
     public function filterType(){
 
         return \twa\uikit\Classes\FilterTypes\Select::class;
