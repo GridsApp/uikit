@@ -20,7 +20,7 @@ class BigNumber extends FieldType
     }
 
     public function db(&$table){
-        $table->bigint($this->field['name'])->nullable();
+        $table->bigInteger($this->field['name'])->nullable();
     }
 
 }
