@@ -37,18 +37,31 @@ class Select extends Component
 
                 if($parent){
 
+                   // dd('CONCAT("'.$this->info['name'].'", "_" ,'.$this->info['options']['table'].'.id) as identifier');
+
+                    // $options->select($this->info['options']['table'].'.id as value' ,
+                    // DB::raw('CONCAT('.$parent['table'].'.'.$parent['field'].', " / " , '.$this->info['options']['table'].'.'.$this->info['options']['field'].' ) as label'),
+                    // DB::raw('CONCAT("'.$this->info['name'].'", "_" ,'.$this->info['options']['table'].'.id) as identifier'));
+
                     $options->select($this->info['options']['table'].'.id as value' ,
-                    DB::raw('CONCAT('.$parent['table'].'.'.$parent['field'].', " / " , '.$this->info['options']['table'].'.'.$this->info['options']['field'].' ) as label'),
-                    DB::raw('CONCAT("'.$this->info['name'].'", "_" ,'.$this->info['options']['table'].'.id) as identifier'));
+                    DB::raw("CONCAT(".$parent['table'].".".$parent['field'].", ' / ' , ".$this->info['options']['table'].".".$this->info['options']['field']." ) as label"),
+                    DB::raw("CONCAT('".$this->info['name']."', '_' ,".$this->info['options']['table'].".id) as identifier"));
+
 
                  $options->leftJoin($parent['table'],
                  $this->info['options']['table'].'.'.$parent['key'], $parent['table'].'.id');
 
                 }else{
 
+
                     $options->select($this->info['options']['table'].'.id as value' ,
                     $this->info['options']['table'].".".$this->info['options']['field'].' as label',
-                    DB::raw('CONCAT("'.$this->info['name'].'", "_" ,'.$this->info['options']['table'].'.id) as identifier'));
+                    DB::raw("CONCAT('".$this->info['name']."', '_' ,".$this->info['options']['table'].".id) as identifier"));
+                
+
+
+
+                
                 }
 
                 $options->whereNull($this->info['options']['table'].'.deleted_at')
