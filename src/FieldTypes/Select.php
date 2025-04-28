@@ -43,7 +43,7 @@ class Select extends FieldType
     {  
 
 
-        if ($this->field['options']['type'] ?? null == "static") {
+        if (isset($this->field['options']['type']) &&  $this->field['options']['type'] == "static") {
             $table->string($this->field['name'])->nullable();
             return;
         }

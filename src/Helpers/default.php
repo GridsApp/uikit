@@ -310,6 +310,36 @@ if (!function_exists('process_menu_item')) {
     
         return $item;
     }
+
+
+if (!function_exists('button')) {
+    function button($label, $type, $grid = null, $role = "submit", $classes = '', $handler = null)
+    {
+
+        
+        $type = $type ?: "primary";
+
+
+        $render = view('UIKitView::components.buttons.' . $type, ['label' => $label, 'role' => $role, 'classes' => $classes, 'handler' => $handler])->render();
+
+        return $grid ? "<div class='" . $grid . "'>" . $render . "</div>" : $render;
+    }
+}
+
+if (!function_exists('link_button')) {
+    function link_button($label, $href, $type, $grid = null)
+    {
+
+   
+
+        $type = $type ?: "primary";
+
+
+        $render = view('UIKitView::components.buttons.' . $type, ['label' => $label, 'href' => $href])->render();
+
+        return $grid ? "<div class='" . $grid . "'>" . $render . "</div>" : $render;
+    }
+}
 }
 
 

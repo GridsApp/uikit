@@ -5,6 +5,8 @@
 @endphp
 
 <div class="twa-select" x-on:record-created-{{ $unique_id }}.window='handleCreateCallback' x-data="Functions.initSelect({{ $info['visible_selections'] ?? 5 }}, '{{ $info['dispatch']['init'] ?? '' }}', '{{ $info['dispatch']['change'] ?? '' }}')">
+
+    {{-- @dump($info['dispatch']['init']) --}}
     <label class="twa-form-label">
         {{ $info['label'] }}
     </label>
