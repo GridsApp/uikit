@@ -10,6 +10,7 @@ class DefaultServiceProvider extends ServiceProvider{
     
     public function boot(){
         Livewire::component('elements.colorpicker',\twa\uikit\Elements\Colorpicker::class);
+        Livewire::component('elements.big-number',\twa\uikit\Elements\BigNumber::class);
         Livewire::component('elements.date',\twa\uikit\Elements\Date::class);
         Livewire::component('elements.datetime',\twa\uikit\Elements\Datetime::class);
         Livewire::component('elements.editor',\twa\uikit\Elements\Editor::class);
