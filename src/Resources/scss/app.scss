@@ -45,11 +45,9 @@ $font-family: "Inter", sans-serif;
 //     outline: none !important;
 // }
 
-
 .container-fixed-header {
     flex-grow: 1;
     width: 100%;
-
 }
 @media (min-width: 1280px) {
     .container-fixed-header {
@@ -176,16 +174,13 @@ input[type="number"] {
     @apply text-[12px]  #{!important};
 }
 .has-prefix {
-input{
-    padding-left: 0 !important;
-}
+    input {
+        padding-left: 0 !important;
+    }
 }
 .has-prefix {
-    [type=number]:focus {
-       
-           
-            outline: 0.5px solid transparent !important;
-  
+    [type="number"]:focus {
+        outline: 0.5px solid transparent !important;
     }
 }
 
@@ -201,6 +196,6 @@ input::placeholder {
     @apply normal-case	 font-normal text-[10px] tracking-normal text-[#4b5563]  #{!important};
 }
 
-.selected-class{
+.selected-class {
     @apply text-[12px];
 }

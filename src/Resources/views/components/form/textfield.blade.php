@@ -7,7 +7,12 @@
     </label>
     <div class="twa-form-input-container">
         <div
-            class=" twa-form-input-ring">
+            class=" twa-form-input-ring  @isset($info['prefix']) has-prefix @endisset">
+
+            @isset($info['prefix'])
+            <span
+                class="placeholder-class ml-2 mr-1  flex items-center ">{{ $info['prefix'] }}</span>
+        @endisset
             <input
                 @if (isset($info['lang']) && $info['lang']) @if (isset($info['channel_language']) &&
                         $info['channel_language'] &&
