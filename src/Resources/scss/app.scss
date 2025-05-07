@@ -179,7 +179,7 @@ input[type="number"] {
     }
 }
 .has-prefix {
-    [type="number"]:focus {
+    input:focus {
         outline: 0.5px solid transparent !important;
     }
 }
