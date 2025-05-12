@@ -4,10 +4,11 @@ namespace twa\uikit\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use twa\uikit\Support\Blade\Directives;
 
 class DefaultServiceProvider extends ServiceProvider{
 
-    
+
     public function boot(){
         Livewire::component('elements.colorpicker',\twa\uikit\Elements\Colorpicker::class);
         Livewire::component('elements.big-number',\twa\uikit\Elements\BigNumber::class);
@@ -29,7 +30,11 @@ class DefaultServiceProvider extends ServiceProvider{
         Livewire::component('components.table',\twa\uikit\Components\Table::class);
         Livewire::component('components.table-grid',\twa\uikit\Components\TableGrid::class);
 
-        
+
+        Directives::register();
+
+
+
         // $this->loadScriptAndStyles();
 
         // $this->publishes([
@@ -40,7 +45,7 @@ class DefaultServiceProvider extends ServiceProvider{
 
     public function register(){
         include_once(__DIR__.'/../Helpers/default.php');
-        
+
         $this->loadViewsFrom(__DIR__.'/../Resources/views/' , 'UIKitView');
 
         $this->loadRoutesFrom(__DIR__.'/../Routes/console.php');
@@ -53,5 +58,5 @@ class DefaultServiceProvider extends ServiceProvider{
 
 
 
-  
+
 }
