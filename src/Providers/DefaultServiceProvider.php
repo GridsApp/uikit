@@ -49,6 +49,7 @@ class DefaultServiceProvider extends ServiceProvider{
         $this->loadViewsFrom(__DIR__.'/../Resources/views/' , 'UIKitView');
 
         $this->loadRoutesFrom(__DIR__.'/../Routes/console.php');
+        $this->loadRoutesFrom(__DIR__.'/../Routes/web.php');
 
         $this->app->singleton('field-assets', function () {
             return get_assets();

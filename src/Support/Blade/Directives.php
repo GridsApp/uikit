@@ -54,7 +54,7 @@ class Directives
     private function format(string $file): string
     {
         return (match (true) { // @phpstan-ignore-line
-            str_ends_with($file, '.js') => fn () => "<script src=\"/twauikit/script/{$file}\" defer></script>",
+            str_ends_with($file, '.js') => fn () => "<script type=\"module\" src=\"/twauikit/script/{$file}\" defer></script>",
             str_ends_with($file, '.css') => fn () => "<link href=\"/twauikit/style/{$file}\" rel=\"stylesheet\" type=\"text/css\">",
         })();
     }
