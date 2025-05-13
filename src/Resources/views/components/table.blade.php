@@ -43,9 +43,19 @@
                     </table>
                 </div>
             @else
-                <div class="flex justify-center p-7.5 py-9">
-                    <img alt="image" class=" max-h-[230px]" src="/images/empty.svg">
+            <div class="flex flex-col h-full items-center justify-center gap-5 p-7.5 py-9">
+ 
+                <div>
+                    <img alt="image" class=" max-h-[100px]" src="/images/empty.png">
                 </div>
+                <div >
+                    <p class="text-md text-center font-medium">No data available</p>
+                    <p class="text-sm text-center pt-2">There are currently no records to display. Please check back later or adjust
+                        your filters.</p>
+
+                </div>
+            </div>
+
             @endif
         </div>
         <div class="card-footer py-5 container-fixed">
