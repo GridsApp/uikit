@@ -29,23 +29,18 @@ class Select extends Component
 
         switch ($this->info['options']['type']) {
 
-            case "static":
+            // case "static":
 
-                // dd("here");
+            //     $options = [];
 
-                $options = [];
-
-                if ($search) {
-                    $options = collect($this->info['options']['list'])->filter(function ($item) use ($search) {
-                        return str(strtolower($item['label']))->contains(strtolower($search));
-                    })->values()->toArray();
-                } else {
-                    $options = $this->info['options']['list'];
-                }
-
-                // dd($options);
-
-                break;
+            //     if ($search) {
+            //         $options = collect($this->info['options']['list'])->filter(function ($item) use ($search) {
+            //             return str(strtolower($item['label']))->contains(strtolower($search));
+            //         })->values()->toArray();
+            //     } else {
+            //         $options = $this->info['options']['list'];
+            //     }
+            //     break;
             case "query":
 
                 $parent = null;
@@ -86,7 +81,6 @@ class Select extends Component
                 }
 
                 $options->whereNull($this->info['options']['table'] . '.deleted_at')
-                    // ->orWhereIn('id',$this->value)
                     ->limit($this->info['query_limit'] ?? 10)
 
 
@@ -130,24 +124,35 @@ class Select extends Component
 
                 break;
             case "static":
+     
                 $options = collect($this->info['options']['list'])->map(function ($item) {
                     $item['identifier'] = $this->info['name'] . '_' . $item['value'];
                     return $item;
                 });
 
-                if (!is_null($id)) {
-                    if (!is_array($id)) {
+                if ($search) {
+     
+                    $options = $options->filter(function ($item) use ($search) {
+                        return str(strtolower($item['label']))->contains(strtolower($search));
+                    })->values();
 
+            
+                }
+
+                if (!is_null($id)) {
+                
+                    if (!is_array($id)) {
                         $options = $options->where('value', $id)->first();
                         $options = $options ? [$options] : [];
                     } else {
-
-                        $options = $options->whereIn('value', $id)->toArray();
+                        $options = $options->whereIn('value', $id)->values()->toArray();
                     }
                 } else {
                     $options = $options->toArray();
                 }
+
                 break;
+
             default:
                 $options = [];
         }
