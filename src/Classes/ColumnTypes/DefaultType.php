@@ -19,6 +19,11 @@ class DefaultType
     }
 
     public function html($parameters = []){
+
+        if(empty($this->input)){
+            return "-";
+        }
+
         return $this->input;
     }
 

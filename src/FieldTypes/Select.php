@@ -1,143 +1,172 @@
 <?php
 
-namespace twa\uikit\FieldTypes;
+namespace twa\uikit\Elements;
 
+use Livewire\Attributes\Modelable;
+use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
-
-
-class Select extends FieldType
+class Select extends Component
 {
-    public function component()
-    { 
-        return "elements.select";
-    }
+    #[Modelable]
+    public $value;
+
+    public $info;
+    public $options;
 
 
-    public function columnType()
-    {
-       
-        if (isset($this->field['multiple']) &&  $this->field['multiple']) {
-            return \twa\uikit\Classes\ColumnTypes\Tags::class;
-        }
-    
-        return \twa\uikit\Classes\ColumnTypes\Tag::class;
-    }
 
-    public function operationType()
+
+    public function mount()
     {
 
-        if (isset($this->field['multiple']) &&  $this->field['multiple']) {
-            return \twa\uikit\Classes\ColumnOperationTypes\ManyToMany::class;
-        }
-    
-        return \twa\uikit\Classes\ColumnOperationTypes\BelongsTo::class;
-    }
-
-
-    public function filterType(){
-
-        return \twa\uikit\Classes\FilterTypes\Select::class;
-    }
-    public function db(&$table)
-    {  
-
-
-        if (isset($this->field['options']['type']) &&  $this->field['options']['type'] == "static") {
-            $table->string($this->field['name'])->nullable();
-            return;
-        }
-
-        if (isset($this->field['multiple']) && $this->field['multiple']) {
-            $table->text($this->field['name'])->nullable();
-        } else {
-            $table->foreignId($this->field['name'])->nullable();
+        if (!isset($this->info['multiple'])) {
+            $this->info['multiple'] = false;
         }
     }
-
-    public function initalValue($data)
-    {
-        if ($this->field['default'] ?? null) {
-            return $this->field['default'];
-        }
-
-        if (isset($this->field['multiple']) && $this->field['multiple']) {
-            $default = [];
-
-            if (!isset($data->{$this->field['name']})) {
-                return $default;
-            }
-
-
-            if (!is_array($data->{$this->field['name']})) {
-                $data->{$this->field['name']} = json_decode($data->{$this->field['name']});
-            }
-
-            return  $data->{$this->field['name']};
-        }
-
-        return $data->{$this->field['name']} ?? null;
-    }
-
-
-    public function value($form)
-    {
-        if (isset($this->field['multiple']) && $this->field['multiple']) {
-            if ($form[$this->field['name']] ?? null) {
-                return json_encode($form[$this->field['name']]);
-            } else {
-                return "[]";
-            }
-        }
-
-        return $form[$this->field['name']] ?? null;
-    }
-
-
-    // public function display($data)
-    // {
-    //     $field = $this->field;
-
-    //     if (!(isset($data[$field['name']]) && $data[$field['name']])) {
-    //         return null;
-    //     }
-    //     if (isset($this->field['multiple']) && $this->field['multiple']) {
-    //         $html = "<div >";
-    //         foreach ($data[$field['name']] ?? [] as $value) {
-    //             if (!empty($value)) {
-    //                 $html .= "<div class=' twa-table-td-select'>" . $value . "</div>";
-    //             }
-    //         }
-    //         $html .= "<div>";
-    //         return $html;
-    //     }
-    //     return $data[$field['name']];
-    // }
-
-
-    public function display($data)
+    public function getOptions($search = null, $id = null)
     {
 
+        switch ($this->info['options']['type']) {
+
+            // case "static":
+
+            //     $options = [];
+
+            //     if ($search) {
+            //         $options = collect($this->info['options']['list'])->filter(function ($item) use ($search) {
+            //             return str(strtolower($item['label']))->contains(strtolower($search));
+            //         })->values()->toArray();
+            //     } else {
+            //         $options = $this->info['options']['list'];
+            //     }
+            //     break;
+            case "query":
+
+                $parent = null;
+                if (isset($this->info['options']["parent"])) {
+                    $parent = $this->info['options']["parent"];
+                }
+
+                $options = DB::table($this->info['options']['table']);
+
+                if ($parent) {
+
+                    // dd('CONCAT("'.$this->info['name'].'", "_" ,'.$this->info['options']['table'].'.id) as identifier');
+
+                    // $options->select($this->info['options']['table'].'.id as value' ,
+                    // DB::raw('CONCAT('.$parent['table'].'.'.$parent['field'].', " / " , '.$this->info['options']['table'].'.'.$this->info['options']['field'].' ) as label'),
+                    // DB::raw('CONCAT("'.$this->info['name'].'", "_" ,'.$this->info['options']['table'].'.id) as identifier'));
+
+                    $options->select(
+                        $this->info['options']['table'] . '.id as value',
+                        DB::raw("CONCAT(" . $parent['table'] . "." . $parent['field'] . ", ' / ' , " . $this->info['options']['table'] . "." . $this->info['options']['field'] . " ) as label"),
+                        DB::raw("CONCAT('" . $this->info['name'] . "', '_' ," . $this->info['options']['table'] . ".id) as identifier")
+                    );
+
+
+                    $options->leftJoin(
+                        $parent['table'],
+                        $this->info['options']['table'] . '.' . $parent['key'],
+                        $parent['table'] . '.id'
+                    );
+                } else {
+
+
+                    $options->select(
+                        $this->info['options']['table'] . '.id as value',
+                        $this->info['options']['table'] . "." . $this->info['options']['field'] . ' as label',
+                        DB::raw("CONCAT('" . $this->info['name'] . "', '_' ," . $this->info['options']['table'] . ".id) as identifier")
+                    );
+                }
+
+                $options->whereNull($this->info['options']['table'] . '.deleted_at')
+                    ->limit($this->info['query_limit'] ?? 10)
+
+
+                    ->when($search, function ($query) use ($search, $parent) {
+
+                        $words = explode(" ", $search);
+
+                        foreach ($words as $word) {
+                            $query->where(function ($q) use ($word, $parent) {
+                                $q->orWhere($this->info['options']['table'] . '.' . $this->info['options']['field'], 'LIKE', $word . '%');
+                                $q->orWhere($this->info['options']['table'] . '.' . $this->info['options']['field'], 'LIKE', '% ' . $word . '%');
+                                if ($parent) {
+                                    $q->orWhere($parent['table'] . '.' . $parent['field'], 'LIKE', $word . '%');
+                                }
+                            });
+                        }
+                    });
+
+
+                foreach ($this->info['options']['conditions'] ?? [] as $condition) {
+                    apply_condition($options, $condition);
+                }
+
+
+
+                $options = $options->orderBy('label', 'ASC');
+
+                if (!is_null($id)) {
+                    if (!is_array($id)) {
+                        $options->where($this->info['options']['table'] . '.' . 'id', $id);
+                    } else {
+                        $options->whereIn($this->info['options']['table'] . '.' . 'id', $id);
+                    }
+                }
+
+
+                $options = $options->get()
+                    ->toArray();
+
+
+
+                break;
+            case "static":
      
-        $field = $this->field;
-        if (!(isset($data[$field['name']]) && $data[$field['name']])) {
-            return null;
+                $options = collect($this->info['options']['list'])->map(function ($item) {
+                    $item['identifier'] = $this->info['name'] . '_' . $item['value'];
+                    return $item;
+                });
+
+                if ($search) {
+     
+                    $options = $options->filter(function ($item) use ($search) {
+                        return str(strtolower($item['label']))->contains(strtolower($search));
+                    })->values();
+
+            
+                }
+
+                if (!is_null($id)) {
+                
+                    if (!is_array($id)) {
+                        $options = $options->where('value', $id)->first();
+                        $options = $options ? [$options] : [];
+                    } else {
+                        $options = $options->whereIn('value', $id)->values()->toArray();
+                    }
+                } else {
+                    $options = $options->toArray();
+                }
+
+                break;
+
+            default:
+                $options = [];
         }
 
-        if (isset($this->field['multiple']) && $this->field['multiple']) {
-            $selectedValues = $data[$field['name']] ?? [];
 
-            $count = count($selectedValues);
-            $html = "<div class='flex gap-1 items-center'>";
-            if ($count > 0) {
-                $html .= "<div class='twa-table-td-select'>" . "<span>  $selectedValues[0]</span> " . "</div>";
-            }
-            if ($count > 1) {
-                $html .= "<div class='twa-table-td-select'>  +" . (count($selectedValues) - 1) . " more</div>";
-            }
-            $html .= "</div>";
-            return $html;
-        }
+        $this->skipRender();
 
-        return $data[$field['name']];
+        return response()->json($options);
+    }
+
+
+    public function render()
+    {
+        $options = [];
+        return view('UIKitView::components.form.select', ['options' =>  $options]);
     }
 }

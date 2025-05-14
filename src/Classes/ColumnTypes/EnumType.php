@@ -13,6 +13,9 @@ class EnumType extends DefaultType
 
         $enum = $parameters['enum'];
 
+        $enumType = $parameters['type'] ?? null;
+
+      
 
         $type = $this->input;
 
@@ -26,6 +29,10 @@ class EnumType extends DefaultType
             return $type;
         }
 
-        return "<div class='twa-table-td-select min-w-24 !px-2 !py-[6px] flex justify-center ' style='background-color:".$selectedEnum->BgColor().";color: ".$selectedEnum->TextColor()." ;' ><span>{$selectedEnum->label()}</span></div>";
+        if($enumType == 'text'){
+            return $selectedEnum->label();
+        }
+
+        return "<div class='twa-table-td-select min-w-40 !px-2 !py-[6px] flex justify-center ' style='background-color:".$selectedEnum->BgColor().";color: ".$selectedEnum->TextColor()." ;' ><span>{$selectedEnum->label()}</span></div>";
     }
 }
