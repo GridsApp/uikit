@@ -183,6 +183,16 @@ input[type="number"] {
         outline: 0.5px solid transparent !important;
     }
 }
+.has-suffix {
+    input {
+        padding-right: 0 !important;
+    }
+}
+.has-suffix {
+    input:focus {
+        outline: 0.5px solid transparent !important;
+    }
+}
 
 .twa-table-td-color {
     @apply flex gap-2 items-center;
