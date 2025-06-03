@@ -5,8 +5,9 @@
 
     <div class="twa-form-input-container">
         <div class="twa-form-input-ring @isset($info['suffix']) has-suffix @endisset">
-            <input type="text" :value="formatted" @input="format($event.target.value)"
-                placeholder="{{ $info['placeholder'] }}" class="twa-form-input">
+
+            <input @if(isset($info['readonly']) && $info['readonly']) readonly @endif type="text" :value="formatted"
+                @input="format($event.target.value)" placeholder="{{ $info['placeholder'] }}" class="twa-form-input">
             <input type="hidden" wire:model="value" name="{{ $info['name'] }}" :value="raw">
 
             @isset($info['suffix'])
@@ -33,7 +34,11 @@
             raw: '',
             formatted: '',
 
-            init(initial) {
+            init() {
+
+
+
+                let initial = this.$wire.value;
                 this.raw = (initial || '').toString().replace(/,/g, '');
                 this.formatted = this.formatNumber(this.raw);
             },
