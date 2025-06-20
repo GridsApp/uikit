@@ -79,19 +79,21 @@
                             <div class="options-box">
                                 @foreach ($table_operations as $index => $table_operation)
                                     @if ($index > 0)
+                                    <a href="{{ $table_operation['link'] }}">
                                         <div class="options-dropdown-menu-item">
                                             <div class="options-dropdown-menu-link">
 
                                                 {!! $table_operation['icon'] ?? '' !!}
-                                                <div>
-                                                    <a href="{{ $table_operation['link'] }}"
+                                                <div
+                                                   
                                                         class="options-dropdown-menu-title cursor-pointer">
                                                         {{ $table_operation['label'] ?? '' }}
-                                                    </a>
+                                                   
                                                 </div>
 
                                             </div>
                                         </div>
+                                    </a>
                                     @endif
                                 @endforeach
                             </div>
