@@ -195,7 +195,7 @@
                                             <a :disabled="checkTDActionsDisabled('{{ $i }}')"
                                                 href="javascript:;" class="icon"
                                                 @click="handleBox(event , '{{ $i }}')">
-                                                <i class="fa-regular fa-ellipsis-vertical"></i>
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
                                             </a>
 
 
