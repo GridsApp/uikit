@@ -15,7 +15,7 @@ window.FontAwesomeKitConfig = {
     "minify": {
         "enabled": true
     },
-    "token": "2d0d0c6706",
+    "token": "dfbedf28c0",
     "v4FontFaceShim": {
         "enabled": false
     },
